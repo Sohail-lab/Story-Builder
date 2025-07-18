@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeftIcon, ChevronRightIcon, BookOpenIcon, PlayIcon, PauseIcon } from '@heroicons/react/24/outline';
+import { RestartButton } from '@/components/ui';
 import { type StoryResponse } from '@/types';
 
 interface StoryDisplayProps {
@@ -528,9 +529,23 @@ export function StoryDisplayStatic({
         className="text-center"
       >
         <div className="text-4xl mb-4">✨</div>
-        <p className="text-amber-400 font-medium text-lg">
+        <p className="text-amber-400 font-medium text-lg mb-6">
           Your adventure awaits your next choice...
         </p>
+        
+        {/* Restart button for story completion */}
+        <RestartButton
+          variant="primary"
+          size="lg"
+          confirmationTitle="Begin a New Quest?"
+          confirmationMessage="Your current adventure has reached its conclusion. Would you like to create a completely new character and embark on a fresh journey?"
+          onRestart={() => {
+            // Navigate to home page for a fresh start
+            if (typeof window !== 'undefined') {
+              window.location.href = '/';
+            }
+          }}
+        />
       </motion.div>
     </div>
   );

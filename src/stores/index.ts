@@ -35,6 +35,55 @@ export const resetAllStores = () => {
 };
 
 /**
+ * Complete session reset with cleanup
+ * Clears all stores, session storage, and animations
+ */
+export const performCompleteReset = async () => {
+  try {
+    // Reset all stores
+    resetAllStores();
+    
+    // Clear session storage
+    sessionStorageUtils.clearSession();
+    
+    // Clear localStorage items related to the app
+    if (typeof window !== 'undefined') {
+      const keysToRemove = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && (
+          key.includes('quiz-store') || 
+          key.includes('player-store') || 
+          key.includes('story-store') || 
+          key.includes('ui-store') ||
+          key.includes('fantasy-quiz')
+        )) {
+          keysToRemove.push(key);
+        }
+      }
+      keysToRemove.forEach(key => localStorage.removeItem(key));
+      
+      // Clear any running animations or timeouts
+      // This helps prevent memory leaks and ensures clean state
+      const highestTimeoutId = setTimeout(() => {}, 0) as unknown as number;
+      for (let i = 0; i < highestTimeoutId; i++) {
+        clearTimeout(i);
+      }
+      
+      const highestIntervalId = setInterval(() => {}, 0) as unknown as number;
+      for (let i = 0; i < highestIntervalId; i++) {
+        clearInterval(i);
+      }
+    }
+    
+    return true;
+  } catch (error) {
+    console.error('Error during complete reset:', error);
+    return false;
+  }
+};
+
+/**
  * Session storage utilities for additional data persistence
  */
 export const sessionStorageUtils = {

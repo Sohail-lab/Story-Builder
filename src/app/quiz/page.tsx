@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { QuizEngine } from '@/components/quiz';
 import { StoryDisplay, StoryGenerator } from '@/components/story';
 import { StarfieldBackground, FloatingOrbs, PageTransition } from '@/components/visual-effects';
+import { StoryRestartButton } from '@/components/ui';
 import { usePlayerStore } from '@/stores/player-store';
 import { useStoryStore } from '@/stores/story-store';
 import { useUIStore } from '@/stores/ui-store';
@@ -143,14 +144,11 @@ export default function QuizPage() {
 
                 {/* Action buttons */}
                 <div className="flex justify-center space-x-4 mt-8">
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={handleStartNewQuest}
-                    className="px-8 py-3 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-500 hover:to-purple-600 text-white font-semibold rounded-lg shadow-lg transition-all duration-200"
-                  >
-                    Start New Quest
-                  </motion.button>
+                  <StoryRestartButton
+                    onRestart={() => {
+                      setPageState('quiz');
+                    }}
+                  />
                   
                   <motion.button
                     whileHover={{ scale: 1.05 }}
