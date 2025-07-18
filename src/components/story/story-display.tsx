@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { ChevronLeftIcon, ChevronRightIcon, BookOpenIcon, PlayIcon, PauseIcon } from '@heroicons/react/24/outline';
 import { type StoryResponse } from '@/types';
 
 interface StoryDisplayProps {
@@ -23,16 +24,16 @@ export function StoryDisplay({
   onComplete, 
   autoStart = true, 
   typewriterSpeed = 30,
-  className = '' 
+  className = ''
 }: StoryDisplayProps) {
+  const [viewMode, setViewMode] = useState<'typewriter' | 'full' | 'sections'>('typewriter');
   const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
   const [displayedText, setDisplayedText] = useState('');
   const [isTyping, setIsTyping] = useState(false);
-  const [isComplete, setIsComplete] = useState(false);
-  const [showSkipButton, setShowSkipButton] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
+  const [completedSections, setCompletedSections] = useState<Set<number>>(new Set());
   
   const typewriterRef = useRef<NodeJS.Timeout | null>(null);
-  const skipTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   
   // Format story into sections
   const storySections: StorySection[] = [
@@ -64,18 +65,23 @@ export function StoryDisplay({
   ];
   
   // Start typewriter effect
-  const startTypewriter = (text: string, onComplete?: () => void) => {
+  const startTypewriter = (text: string, sectionIndex: number, onComplete?: () => void) => {
+    if (isPaused) return;
+    
     setIsTyping(true);
     setDisplayedText('');
     
     let index = 0;
     const typeNextChar = () => {
+      if (isPaused) return;
+      
       if (index < text.length) {
         setDisplayedText(prev => prev + text[index]);
         index++;
         typewriterRef.current = setTimeout(typeNextChar, typewriterSpeed);
       } else {
         setIsTyping(false);
+        setCompletedSections(prev => new Set([...prev, sectionIndex]));
         onComplete?.();
       }
     };
@@ -83,99 +89,233 @@ export function StoryDisplay({
     typeNextChar();
   };
   
-  // Skip current section
-  const skipCurrentSection = () => {
+  // Navigate to specific section
+  const goToSection = (index: number) => {
     if (typewriterRef.current) {
       clearTimeout(typewriterRef.current);
     }
-    const currentSection = storySections[currentSectionIndex];
-    if (currentSection) {
-      setDisplayedText(currentSection.content);
-    }
-    setIsTyping(false);
     
-    // Auto-advance to next section after a brief pause
-    setTimeout(() => {
-      advanceToNextSection();
-    }, 500);
-  };
-  
-  // Skip to end
-  const skipToEnd = () => {
-    if (typewriterRef.current) {
-      clearTimeout(typewriterRef.current);
-    }
-    const lastIndex = storySections.length - 1;
-    const lastSection = storySections[lastIndex];
-    if (lastSection) {
-      setCurrentSectionIndex(lastIndex);
-      setDisplayedText(lastSection.content);
-    }
+    setCurrentSectionIndex(index);
     setIsTyping(false);
-    setIsComplete(true);
-    onComplete?.();
+    setIsPaused(true);
+    
+    const section = storySections[index];
+    if (section) {
+      setDisplayedText(section.content);
+      setCompletedSections(prev => new Set([...prev, index]));
+    }
   };
   
-  // Advance to next section
-  const advanceToNextSection = () => {
+  // Navigate to next section
+  const nextSection = () => {
     if (currentSectionIndex < storySections.length - 1) {
-      const nextIndex = currentSectionIndex + 1;
-      const nextSection = storySections[nextIndex];
-      
-      if (nextSection) {
-        setCurrentSectionIndex(nextIndex);
-        
-        setTimeout(() => {
-          startTypewriter(nextSection.content, () => {
-            if (nextIndex === storySections.length - 1) {
-              setIsComplete(true);
-              onComplete?.();
-            } else {
-              setTimeout(() => {
-                advanceToNextSection();
-              }, storySections[nextIndex + 1]?.delay || 1000);
-            }
-          });
-        }, nextSection.delay);
+      goToSection(currentSectionIndex + 1);
+    }
+  };
+  
+  // Navigate to previous section
+  const previousSection = () => {
+    if (currentSectionIndex > 0) {
+      goToSection(currentSectionIndex - 1);
+    }
+  };
+  
+  // Toggle typewriter mode
+  const toggleTypewriter = () => {
+    if (isTyping) {
+      setIsPaused(!isPaused);
+    } else {
+      const section = storySections[currentSectionIndex];
+      if (section) {
+        startTypewriter(section.content, currentSectionIndex);
       }
     }
+  };
+  
+  // Switch to full story view
+  const showFullStory = () => {
+    setViewMode('full');
+  };
+  
+  // Switch to section navigation view
+  const showSectionView = () => {
+    setViewMode('sections');
+  };
+  
+  // Switch back to typewriter view
+  const showTypewriterView = () => {
+    setViewMode('typewriter');
+    setIsPaused(false);
   };
   
   // Initialize typewriter on mount
   useEffect(() => {
-    if (autoStart && storySections.length > 0) {
+    if (autoStart && viewMode === 'typewriter' && storySections.length > 0) {
       const firstSection = storySections[0];
       if (firstSection) {
-        startTypewriter(firstSection.content, () => {
-          if (storySections.length > 1) {
-            const secondSection = storySections[1];
-            setTimeout(() => {
-              advanceToNextSection();
-            }, secondSection?.delay || 1000);
-          } else {
-            setIsComplete(true);
-            onComplete?.();
-          }
-        });
+        startTypewriter(firstSection.content, 0);
       }
-      
-      // Show skip button after 3 seconds
-      skipTimeoutRef.current = setTimeout(() => {
-        setShowSkipButton(true);
-      }, 3000);
     }
     
     return () => {
       if (typewriterRef.current) {
         clearTimeout(typewriterRef.current);
       }
-      if (skipTimeoutRef.current) {
-        clearTimeout(skipTimeoutRef.current);
-      }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [autoStart, typewriterSpeed]);
+  }, [autoStart, typewriterSpeed, viewMode]);
   
+  // Full story view
+  if (viewMode === 'full') {
+    return (
+      <div className={`relative max-w-4xl mx-auto ${className}`}>
+        {/* View mode controls */}
+        <div className="flex justify-center mb-6 space-x-2">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={showTypewriterView}
+            className="flex items-center gap-2 px-4 py-2 bg-slate-700/80 hover:bg-slate-600/80 text-slate-300 hover:text-white font-medium rounded-lg border border-slate-600 transition-all duration-200"
+          >
+            <PlayIcon className="w-4 h-4" />
+            Typewriter
+          </motion.button>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={showSectionView}
+            className="flex items-center gap-2 px-4 py-2 bg-slate-700/80 hover:bg-slate-600/80 text-slate-300 hover:text-white font-medium rounded-lg border border-slate-600 transition-all duration-200"
+          >
+            <ChevronRightIcon className="w-4 h-4" />
+            Sections
+          </motion.button>
+          <motion.button
+            className="flex items-center gap-2 px-4 py-2 bg-amber-600/80 text-white font-medium rounded-lg border border-amber-500"
+          >
+            <BookOpenIcon className="w-4 h-4" />
+            Full Story
+          </motion.button>
+        </div>
+        
+        <StoryDisplayStatic story={story} />
+      </div>
+    );
+  }
+  
+  // Section navigation view
+  if (viewMode === 'sections') {
+    return (
+      <div className={`relative max-w-4xl mx-auto ${className}`}>
+        {/* View mode controls */}
+        <div className="flex justify-center mb-6 space-x-2">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={showTypewriterView}
+            className="flex items-center gap-2 px-4 py-2 bg-slate-700/80 hover:bg-slate-600/80 text-slate-300 hover:text-white font-medium rounded-lg border border-slate-600 transition-all duration-200"
+          >
+            <PlayIcon className="w-4 h-4" />
+            Typewriter
+          </motion.button>
+          <motion.button
+            className="flex items-center gap-2 px-4 py-2 bg-amber-600/80 text-white font-medium rounded-lg border border-amber-500"
+          >
+            <ChevronRightIcon className="w-4 h-4" />
+            Sections
+          </motion.button>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={showFullStory}
+            className="flex items-center gap-2 px-4 py-2 bg-slate-700/80 hover:bg-slate-600/80 text-slate-300 hover:text-white font-medium rounded-lg border border-slate-600 transition-all duration-200"
+          >
+            <BookOpenIcon className="w-4 h-4" />
+            Full Story
+          </motion.button>
+        </div>
+        
+        {/* Section navigation */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+          {storySections.map((section, index) => (
+            <motion.button
+              key={index}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => goToSection(index)}
+              className={`p-4 rounded-xl border transition-all duration-200 text-left ${
+                index === currentSectionIndex
+                  ? 'bg-amber-600/20 border-amber-400/50 text-amber-200'
+                  : 'bg-slate-800/40 border-slate-600/50 text-slate-300 hover:bg-slate-700/40'
+              }`}
+            >
+              <h3 className="font-semibold mb-2">{section.title}</h3>
+              <p className="text-sm opacity-75 line-clamp-2">
+                {section.content.substring(0, 100)}...
+              </p>
+              {completedSections.has(index) && (
+                <div className="mt-2 text-green-400 text-xs">✓ Read</div>
+              )}
+            </motion.button>
+          ))}
+        </div>
+        
+        {/* Current section display */}
+        <motion.div
+          key={currentSectionIndex}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-slate-800/40 backdrop-blur-sm border border-amber-400/20 rounded-2xl p-6 md:p-8"
+        >
+          <h2 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-amber-400 to-amber-300 bg-clip-text text-transparent mb-6 text-center">
+            {storySections[currentSectionIndex]?.title}
+          </h2>
+          
+          <p className="text-slate-200 leading-relaxed text-base md:text-lg">
+            {storySections[currentSectionIndex]?.content}
+          </p>
+          
+          {/* Navigation controls */}
+          <div className="flex justify-between items-center mt-8">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={previousSection}
+              disabled={currentSectionIndex === 0}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+                currentSectionIndex === 0
+                  ? 'bg-slate-800/30 text-slate-500 cursor-not-allowed'
+                  : 'bg-slate-700/80 hover:bg-slate-600/80 text-slate-300 hover:text-white'
+              }`}
+            >
+              <ChevronLeftIcon className="w-4 h-4" />
+              Previous
+            </motion.button>
+            
+            <div className="text-slate-400 text-sm">
+              {currentSectionIndex + 1} of {storySections.length}
+            </div>
+            
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={nextSection}
+              disabled={currentSectionIndex === storySections.length - 1}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+                currentSectionIndex === storySections.length - 1
+                  ? 'bg-slate-800/30 text-slate-500 cursor-not-allowed'
+                  : 'bg-amber-600/80 hover:bg-amber-500/80 text-white'
+              }`}
+            >
+              Next
+              <ChevronRightIcon className="w-4 h-4" />
+            </motion.button>
+          </div>
+        </motion.div>
+      </div>
+    );
+  }
+  
+  // Typewriter view (default)
   const currentSection = storySections[currentSectionIndex];
   
   if (!currentSection) {
@@ -184,6 +324,34 @@ export function StoryDisplay({
   
   return (
     <div className={`relative max-w-4xl mx-auto ${className}`}>
+      {/* View mode controls */}
+      <div className="flex justify-center mb-6 space-x-2">
+        <motion.button
+          className="flex items-center gap-2 px-4 py-2 bg-amber-600/80 text-white font-medium rounded-lg border border-amber-500"
+        >
+          <PlayIcon className="w-4 h-4" />
+          Typewriter
+        </motion.button>
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={showSectionView}
+          className="flex items-center gap-2 px-4 py-2 bg-slate-700/80 hover:bg-slate-600/80 text-slate-300 hover:text-white font-medium rounded-lg border border-slate-600 transition-all duration-200"
+        >
+          <ChevronRightIcon className="w-4 h-4" />
+          Sections
+        </motion.button>
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={showFullStory}
+          className="flex items-center gap-2 px-4 py-2 bg-slate-700/80 hover:bg-slate-600/80 text-slate-300 hover:text-white font-medium rounded-lg border border-slate-600 transition-all duration-200"
+        >
+          <BookOpenIcon className="w-4 h-4" />
+          Full Story
+        </motion.button>
+      </div>
+      
       {/* Ambient background effects */}
       <div className="absolute inset-0 -z-10">
         <div className="absolute inset-0 bg-gradient-to-br from-slate-900/50 via-purple-900/20 to-amber-900/30 rounded-2xl" />
@@ -229,7 +397,7 @@ export function StoryDisplay({
             >
               <p className="text-slate-200 leading-relaxed text-base md:text-lg lg:text-xl font-medium tracking-wide">
                 {displayedText}
-                {isTyping && (
+                {isTyping && !isPaused && (
                   <motion.span
                     animate={{ opacity: [1, 0] }}
                     transition={{ duration: 0.8, repeat: Infinity, repeatType: "reverse" }}
@@ -246,75 +414,70 @@ export function StoryDisplay({
           {/* Progress indicator */}
           <div className="mt-8 flex justify-center items-center space-x-2">
             {storySections.map((_, index) => (
-              <motion.div
+              <motion.button
                 key={index}
-                className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                  index <= currentSectionIndex 
+                whileHover={{ scale: 1.2 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={() => goToSection(index)}
+                className={`w-3 h-3 rounded-full transition-all duration-300 cursor-pointer ${
+                  index === currentSectionIndex 
                     ? 'bg-amber-400 shadow-lg shadow-amber-400/50' 
-                    : 'bg-slate-600'
+                    : completedSections.has(index)
+                    ? 'bg-green-400 shadow-lg shadow-green-400/50'
+                    : 'bg-slate-600 hover:bg-slate-500'
                 }`}
-                animate={index === currentSectionIndex ? { scale: [1, 1.2, 1] } : {}}
-                transition={{ duration: 2, repeat: Infinity }}
+                title={storySections[index]?.title || ''}
               />
             ))}
           </div>
-        </div>
-      </motion.div>
-      
-      {/* Control buttons */}
-      <AnimatePresence>
-        {showSkipButton && !isComplete && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="flex justify-center mt-6 space-x-4"
-          >
+          
+          {/* Typewriter controls */}
+          <div className="flex justify-center mt-6 space-x-4">
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              onClick={skipCurrentSection}
-              className="px-4 py-2 bg-slate-700/80 hover:bg-slate-600/80 text-slate-300 hover:text-white font-medium rounded-lg border border-slate-600 transition-all duration-200 backdrop-blur-sm"
+              onClick={toggleTypewriter}
+              className="flex items-center gap-2 px-4 py-2 bg-amber-600/80 hover:bg-amber-500/80 text-white font-medium rounded-lg border border-amber-500 transition-all duration-200"
             >
-              Skip Section
+              {isTyping && !isPaused ? (
+                <>
+                  <PauseIcon className="w-4 h-4" />
+                  Pause
+                </>
+              ) : (
+                <>
+                  <PlayIcon className="w-4 h-4" />
+                  {isTyping ? 'Resume' : 'Replay'}
+                </>
+              )}
             </motion.button>
             
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={skipToEnd}
-              className="px-4 py-2 bg-amber-600/80 hover:bg-amber-500/80 text-white font-medium rounded-lg border border-amber-500 transition-all duration-200 backdrop-blur-sm"
-            >
-              Skip to End
-            </motion.button>
-          </motion.div>
-        )}
-      </AnimatePresence>
-      
-      {/* Completion indicator */}
-      <AnimatePresence>
-        {isComplete && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="text-center mt-8"
-          >
-            <motion.div
-              animate={{ 
-                scale: [1, 1.05, 1],
-                rotate: [0, 1, -1, 0]
-              }}
-              transition={{ duration: 3, repeat: Infinity }}
-              className="inline-block text-4xl mb-4"
-            >
-              ✨
-            </motion.div>
-            <p className="text-amber-400 font-medium text-lg">
-              Your adventure awaits your next choice...
-            </p>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            {currentSectionIndex > 0 && (
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={previousSection}
+                className="flex items-center gap-2 px-4 py-2 bg-slate-700/80 hover:bg-slate-600/80 text-slate-300 hover:text-white font-medium rounded-lg border border-slate-600 transition-all duration-200"
+              >
+                <ChevronLeftIcon className="w-4 h-4" />
+                Previous
+              </motion.button>
+            )}
+            
+            {currentSectionIndex < storySections.length - 1 && (
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={nextSection}
+                className="flex items-center gap-2 px-4 py-2 bg-slate-700/80 hover:bg-slate-600/80 text-slate-300 hover:text-white font-medium rounded-lg border border-slate-600 transition-all duration-200"
+              >
+                Next
+                <ChevronRightIcon className="w-4 h-4" />
+              </motion.button>
+            )}
+          </div>
+        </div>
+      </motion.div>
     </div>
   );
 }

@@ -146,10 +146,20 @@ export class GeminiService {
             throw new GeminiAPIError('Empty response from API');
           }
           
-          // Parse the JSON response
+          // Parse the JSON response (handle markdown code blocks)
           let parsedResponse: unknown;
           try {
-            parsedResponse = JSON.parse(text);
+            // Clean the response text to handle markdown code blocks
+            let cleanText = text.trim();
+            
+            // Remove markdown code block markers if present
+            if (cleanText.startsWith('```json')) {
+              cleanText = cleanText.replace(/^```json\s*/, '').replace(/\s*```$/, '');
+            } else if (cleanText.startsWith('```')) {
+              cleanText = cleanText.replace(/^```\s*/, '').replace(/\s*```$/, '');
+            }
+            
+            parsedResponse = JSON.parse(cleanText);
           } catch (parseError) {
             throw new GeminiValidationError(
               `Failed to parse API response as JSON: ${parseError instanceof Error ? parseError.message : 'Unknown parse error'}`

@@ -39,10 +39,16 @@ export function StoryGenerator({
   
   // Auto-generate story when component mounts
   useEffect(() => {
-    if (autoGenerate && !generatedStory && !isGenerating && !generationError) {
-      generateStory(playerProfile);
+    if (autoGenerate && !isGenerating && !generationError) {
+      // If we already have a story, trigger the onStoryGenerated callback immediately
+      if (generatedStory) {
+        onStoryGenerated?.();
+      } else {
+        // Generate new story
+        generateStory(playerProfile);
+      }
     }
-  }, [autoGenerate, generatedStory, isGenerating, generationError, generateStory, playerProfile]);
+  }, [autoGenerate, generatedStory, isGenerating, generationError, generateStory, playerProfile, onStoryGenerated]);
   
   // Handle manual story generation
   const handleGenerateStory = async () => {

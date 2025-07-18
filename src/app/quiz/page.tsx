@@ -140,7 +140,10 @@ export default function QuizPage() {
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    onClick={() => setPageState('story-generation')}
+                    onClick={() => {
+                      resetStoryState(); // Clear the old story first
+                      setPageState('story-generation');
+                    }}
                     className="px-8 py-3 bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 text-white font-semibold rounded-lg shadow-lg transition-all duration-200"
                   >
                     Generate New Story
