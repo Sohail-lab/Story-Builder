@@ -9,3 +9,6 @@ export * from './landing';
 
 // Question Components
 export * from './questions';
+
+// Quiz Engine Components
+export * from './quiz';
