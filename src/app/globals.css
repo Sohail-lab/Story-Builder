@@ -1,26 +1,497 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Fantasy Theme CSS Custom Properties */
+  --primary-bg: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+  --secondary-bg: rgba(139, 69, 19, 0.1);
+  --accent-color: #ffd700;
+  --text-primary: #f0f0f0;
+  --text-secondary: #c0c0c0;
+  --border-color: #8b4513;
+  --shadow-color: rgba(0, 0, 0, 0.5);
+  --magical-glow: rgba(255, 215, 0, 0.3);
+  --mystical-purple: rgba(108, 33, 168, 0.4);
+  
+  /* Default theme variables */
+  --background: #0B1426;
+  --foreground: #f0f0f0;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-sans: 'Inter', sans-serif;
+  --font-fantasy-serif: 'Cinzel', serif;
 }
 
 body {
+  background: var(--primary-bg);
+  color: var(--text-primary);
+  font-family: 'Inter', sans-serif;
+  min-height: 100vh;
+}
+
+/* Fantasy-themed scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--secondary-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--accent-color);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #e6c200;
+}
+
+/* Base animation classes */
+.animate-twinkle {
+  animation: twinkle 2s ease-in-out infinite alternate;
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-glow {
+  animation: glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes twinkle {
+  0% { opacity: 0.3; }
+  100% { opacity: 1; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes glow {
+  0% { box-shadow: 0 0 5px var(--magical-glow); }
+  100% { box-shadow: 0 0 20px var(--magical-glow); }
+}
+
+/* Typography System */
+.fantasy-heading {
+  font-family: 'Cinzel', serif;
+  font-weight: 600;
+  color: var(--accent-color);
+  text-shadow: 0 0 10px var(--magical-glow);
+}
+
+.fantasy-display {
+  font-family: 'MedievalSharp', cursive;
+  color: var(--accent-color);
+  text-shadow: 0 0 15px var(--magical-glow);
+}
+
+.fantasy-body {
+  font-family: 'Inter', sans-serif;
+  color: var(--text-primary);
+  line-height: 1.6;
+}
+
+.fantasy-secondary {
+  color: var(--text-secondary);
+}
+
+/* Fantasy-themed form elements */
+.fantasy-input {
+  background: rgba(30, 41, 59, 0.8);
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  padding: 12px 16px;
+  color: var(--text-primary);
+  font-family: 'Inter', sans-serif;
+  transition: all 0.3s ease;
+}
+
+.fantasy-input:focus {
+  outline: none;
+  border-color: var(--accent-color);
+  box-shadow: 0 0 10px var(--magical-glow);
+}
+
+.fantasy-input::placeholder {
+  color: var(--text-secondary);
+}
+
+/* Fantasy-themed buttons */
+.fantasy-button {
+  background: linear-gradient(135deg, var(--border-color), #a0522d);
+  border: 2px solid var(--accent-color);
+  border-radius: 8px;
+  padding: 12px 24px;
+  color: var(--text-primary);
+  font-family: 'Cinzel', serif;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.fantasy-button:hover {
+  background: linear-gradient(135deg, #a0522d, var(--border-color));
+  box-shadow: 0 0 15px var(--magical-glow);
+  transform: translateY(-2px);
+}
+
+.fantasy-button:active {
+  transform: translateY(0);
+}
+
+.fantasy-button-primary {
+  background: linear-gradient(135deg, var(--accent-color), #e6c200);
+  color: var(--background);
+  border-color: var(--accent-color);
+}
+
+.fantasy-button-primary:hover {
+  background: linear-gradient(135deg, #e6c200, var(--accent-color));
+  box-shadow: 0 0 20px var(--magical-glow);
+}
+
+/* Fantasy-themed cards */
+.fantasy-card {
+  background: rgba(30, 41, 59, 0.9);
+  border: 2px solid var(--border-color);
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 8px 32px var(--shadow-color);
+  backdrop-filter: blur(10px);
+}
+
+.fantasy-card-glow {
+  box-shadow: 0 8px 32px var(--shadow-color), 0 0 20px var(--magical-glow);
+}
+
+/* Ornate borders */
+.fantasy-border {
+  position: relative;
+}
+
+.fantasy-border::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg, var(--accent-color), var(--border-color), var(--accent-color));
+  border-radius: inherit;
+  z-index: -1;
+}
+
+/* Fantasy Component Utilities */
+
+/* Magical Background Effects */
+.fantasy-starfield {
+  position: relative;
+  overflow: hidden;
+}
+
+.fantasy-starfield::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    radial-gradient(2px 2px at 20px 30px, #ffd700, transparent),
+    radial-gradient(2px 2px at 40px 70px, rgba(255, 215, 0, 0.8), transparent),
+    radial-gradient(1px 1px at 90px 40px, #ffd700, transparent),
+    radial-gradient(1px 1px at 130px 80px, rgba(255, 215, 0, 0.6), transparent),
+    radial-gradient(2px 2px at 160px 30px, #ffd700, transparent);
+  background-repeat: repeat;
+  background-size: 200px 100px;
+  animation: twinkle 4s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+/* Floating Orbs */
+.fantasy-orbs {
+  position: relative;
+}
+
+.fantasy-orbs::after {
+  content: '';
+  position: absolute;
+  top: 20%;
+  right: 10%;
+  width: 60px;
+  height: 60px;
+  background: radial-gradient(circle, rgba(255, 215, 0, 0.3) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: float 6s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.fantasy-orbs::before {
+  content: '';
+  position: absolute;
+  bottom: 30%;
+  left: 15%;
+  width: 40px;
+  height: 40px;
+  background: radial-gradient(circle, rgba(139, 69, 19, 0.4) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: float 4s ease-in-out infinite reverse;
+  pointer-events: none;
+}
+
+/* Magical Progress Bar */
+.fantasy-progress {
+  background: rgba(30, 41, 59, 0.8);
+  border: 2px solid var(--border-color);
+  border-radius: 20px;
+  height: 12px;
+  overflow: hidden;
+  position: relative;
+}
+
+.fantasy-progress-fill {
+  background: linear-gradient(90deg, var(--accent-color), #e6c200);
+  height: 100%;
+  border-radius: inherit;
+  position: relative;
+  transition: width 0.5s ease-in-out;
+}
+
+.fantasy-progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  animation: shimmer 2s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* Fantasy Radio Buttons */
+.fantasy-radio {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--border-color);
+  border-radius: 50%;
+  background: rgba(30, 41, 59, 0.8);
+  position: relative;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.fantasy-radio:checked {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 10px var(--magical-glow);
+}
+
+.fantasy-radio:checked::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 8px;
+  height: 8px;
+  background: var(--accent-color);
+  border-radius: 50%;
+  box-shadow: 0 0 5px var(--magical-glow);
+}
+
+/* Fantasy Checkbox */
+.fantasy-checkbox {
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--border-color);
+  border-radius: 4px;
+  background: rgba(30, 41, 59, 0.8);
+  position: relative;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.fantasy-checkbox:checked {
+  border-color: var(--accent-color);
+  background: var(--accent-color);
+  box-shadow: 0 0 10px var(--magical-glow);
+}
+
+.fantasy-checkbox:checked::after {
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: var(--background);
+  font-weight: bold;
+  font-size: 14px;
+}
+
+/* Fantasy Loading Spinner */
+.fantasy-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(255, 215, 0, 0.3);
+  border-top: 3px solid var(--accent-color);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.fantasy-spinner-large {
+  width: 60px;
+  height: 60px;
+  border-width: 4px;
+}
+
+/* Fantasy Tooltip */
+.fantasy-tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+.fantasy-tooltip::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(30, 41, 59, 0.95);
+  color: var(--text-primary);
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid var(--border-color);
+  font-size: 14px;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+
+.fantasy-tooltip::before {
+  content: '';
+  position: absolute;
+  bottom: 115%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: var(--border-color);
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.fantasy-tooltip:hover::after,
+.fantasy-tooltip:hover::before {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Fantasy Modal Backdrop */
+.fantasy-modal-backdrop {
+  background: rgba(11, 20, 38, 0.8);
+  backdrop-filter: blur(5px);
+}
+
+/* Fantasy Divider */
+.fantasy-divider {
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--border-color), transparent);
+  margin: 2rem 0;
+  position: relative;
+}
+
+.fantasy-divider::after {
+  content: '✦';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  color: var(--accent-color);
+  padding: 0 1rem;
+  font-size: 1.2rem;
+}
+
+/* Responsive typography */
+@media (max-width: 640px) {
+  .fantasy-heading {
+    font-size: 1.5rem;
+  }
+  
+  .fantasy-display {
+    font-size: 2rem;
+  }
+  
+  .fantasy-orbs::after {
+    width: 40px;
+    height: 40px;
+    top: 10%;
+    right: 5%;
+  }
+  
+  .fantasy-orbs::before {
+    width: 30px;
+    height: 30px;
+    bottom: 20%;
+    left: 10%;
+  }
+  
+  .fantasy-progress {
+    height: 10px;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+  .fantasy-heading {
+    font-size: 2rem;
+  }
+  
+  .fantasy-display {
+    font-size: 2.5rem;
+  }
+}
+
+@media (min-width: 1025px) {
+  .fantasy-heading {
+    font-size: 2.5rem;
+  }
+  
+  .fantasy-display {
+    font-size: 3rem;
+  }
+}
+
+/* Print styles */
+@media print {
+  .fantasy-starfield::before,
+  .fantasy-orbs::after,
+  .fantasy-orbs::before {
+    display: none;
+  }
+  
+  .fantasy-card {
+    box-shadow: none;
+    border: 1px solid #ccc;
+  }
 }
