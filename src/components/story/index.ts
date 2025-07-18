@@ -1,4 +1,5 @@
 export * from './story-generator';
+export * from './story-display';
 
 // Re-export main components
 export { 
@@ -6,3 +7,8 @@ export {
   StoryGenerationLoading,
   StoryGenerationError 
 } from './story-generator';
+
+export {
+  StoryDisplay,
+  StoryDisplayStatic
+} from './story-display';
