@@ -15,3 +15,6 @@ export * from './quiz';
 
 // Validation Components
 export * from './validation';
+
+// Story Components
+export * from './story';
