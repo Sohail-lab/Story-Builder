@@ -12,6 +12,7 @@ import {
   HybridQuestion, 
   GenderQuestion 
 } from '@/components/questions';
+import { FormProvider, ErrorBoundary } from '@/components/validation';
 import { type Question } from '@/types';
 
 interface QuizEngineProps {
@@ -134,89 +135,93 @@ export function QuizEngine({ onComplete, className = '' }: QuizEngineProps) {
   }
 
   return (
-    <div className={`w-full max-w-4xl mx-auto px-4 ${className}`}>
-      {/* Progress Bar */}
-      <ProgressBar
-        progress={progress}
-        currentQuestion={currentQuestionIndex}
-        totalQuestions={totalQuestions}
-        className="mb-8"
-      />
+    <ErrorBoundary>
+      <FormProvider>
+        <div className={`w-full max-w-4xl mx-auto px-4 ${className}`}>
+          {/* Progress Bar */}
+          <ProgressBar
+            progress={progress}
+            currentQuestion={currentQuestionIndex}
+            totalQuestions={totalQuestions}
+            className="mb-8"
+          />
 
-      {/* Question Container */}
-      <div className="min-h-[500px] flex flex-col justify-center">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={currentQuestionIndex}
-            initial={{ opacity: 0, x: 50, scale: 0.95 }}
-            animate={{ opacity: 1, x: 0, scale: 1 }}
-            exit={{ opacity: 0, x: -50, scale: 0.95 }}
-            transition={{ 
-              duration: 0.4, 
-              ease: "easeInOut",
-              type: "spring",
-              stiffness: 100,
-              damping: 15
-            }}
-            className="w-full"
-          >
-            {/* Question Header */}
-            <div className="text-center mb-8">
-              <motion.h2 
-                className="text-2xl md:text-3xl font-bold text-amber-100 mb-4 leading-relaxed"
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2, duration: 0.5 }}
+          {/* Question Container */}
+          <div className="min-h-[500px] flex flex-col justify-center">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={currentQuestionIndex}
+                initial={{ opacity: 0, x: 50, scale: 0.95 }}
+                animate={{ opacity: 1, x: 0, scale: 1 }}
+                exit={{ opacity: 0, x: -50, scale: 0.95 }}
+                transition={{ 
+                  duration: 0.4, 
+                  ease: "easeInOut",
+                  type: "spring",
+                  stiffness: 100,
+                  damping: 15
+                }}
+                className="w-full"
               >
-                {processedQuestion.text}
-              </motion.h2>
-              
-              {processedQuestion.required && (
-                <motion.p 
-                  className="text-amber-300/70 text-sm"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.4, duration: 0.5 }}
+                {/* Question Header */}
+                <div className="text-center mb-8">
+                  <motion.h2 
+                    className="text-2xl md:text-3xl font-bold text-amber-100 mb-4 leading-relaxed"
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2, duration: 0.5 }}
+                  >
+                    {processedQuestion.text}
+                  </motion.h2>
+                  
+                  {processedQuestion.required && (
+                    <motion.p 
+                      className="text-amber-300/70 text-sm"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.4, duration: 0.5 }}
+                    >
+                      * This question is required
+                    </motion.p>
+                  )}
+                </div>
+
+                {/* Question Component */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3, duration: 0.5 }}
+                  className="mb-8"
                 >
-                  * This question is required
-                </motion.p>
-              )}
+                  {renderQuestion(processedQuestion)}
+                </motion.div>
+              </motion.div>
+            </AnimatePresence>
+          </div>
+
+          {/* Navigation Controls */}
+          <NavigationControls
+            canGoBack={canGoToPrevious()}
+            canGoForward={isCurrentQuestionAnswered()}
+            onPrevious={handlePrevious}
+            onNext={handleNext}
+            isLastQuestion={isLastQuestion}
+            onComplete={handleComplete}
+            className="mt-8"
+          />
+
+          {/* Debug Info (only in development) */}
+          {process.env.NODE_ENV === 'development' && (
+            <div className="mt-8 p-4 bg-slate-800/30 rounded-lg border border-slate-600/30 text-xs text-slate-400">
+              <div>Current Question: {currentQuestionIndex + 1}/{totalQuestions}</div>
+              <div>Question ID: {processedQuestion.id}</div>
+              <div>Answer: {answers[processedQuestion.id] || 'Not answered'}</div>
+              <div>Can Proceed: {isCurrentQuestionAnswered() ? 'Yes' : 'No'}</div>
+              <div>Progress: {progress}%</div>
             </div>
-
-            {/* Question Component */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3, duration: 0.5 }}
-              className="mb-8"
-            >
-              {renderQuestion(processedQuestion)}
-            </motion.div>
-          </motion.div>
-        </AnimatePresence>
-      </div>
-
-      {/* Navigation Controls */}
-      <NavigationControls
-        canGoBack={canGoToPrevious()}
-        canGoForward={isCurrentQuestionAnswered()}
-        onPrevious={handlePrevious}
-        onNext={handleNext}
-        isLastQuestion={isLastQuestion}
-        onComplete={handleComplete}
-        className="mt-8"
-      />
-
-      {/* Debug Info (only in development) */}
-      {process.env.NODE_ENV === 'development' && (
-        <div className="mt-8 p-4 bg-slate-800/30 rounded-lg border border-slate-600/30 text-xs text-slate-400">
-          <div>Current Question: {currentQuestionIndex + 1}/{totalQuestions}</div>
-          <div>Question ID: {processedQuestion.id}</div>
-          <div>Answer: {answers[processedQuestion.id] || 'Not answered'}</div>
-          <div>Can Proceed: {isCurrentQuestionAnswered() ? 'Yes' : 'No'}</div>
-          <div>Progress: {progress}%</div>
+          )}
         </div>
-      )}
-    </div>
+      </FormProvider>
+    </ErrorBoundary>
   );
 }

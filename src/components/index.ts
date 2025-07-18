@@ -12,3 +12,6 @@ export * from './questions';
 
 // Quiz Engine Components
 export * from './quiz';
+
+// Validation Components
+export * from './validation';

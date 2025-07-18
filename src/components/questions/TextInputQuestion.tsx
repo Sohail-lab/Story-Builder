@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { QuestionComponentProps } from '@/types';
+import { ErrorMessage, ValidationFeedback, useQuestionValidation } from '@/components/validation';
 
 export const TextInputQuestion: React.FC<QuestionComponentProps> = ({
   question,
@@ -12,15 +13,43 @@ export const TextInputQuestion: React.FC<QuestionComponentProps> = ({
 }) => {
   const [isFocused, setIsFocused] = useState(false);
   const [inputValue, setInputValue] = useState(value);
+  
+  // Use validation hook
+  const {
+    validateQuestion,
+    debouncedValidate,
+    isValidating,
+    isValid,
+    error: validationError
+  } = useQuestionValidation(question.id);
+
+  // Use validation error if available, otherwise use prop error
+  const displayError = validationError || error;
+
+  useEffect(() => {
+    setInputValue(value);
+  }, [value]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = e.target.value;
     setInputValue(newValue);
     onChange(newValue);
+    
+    // Trigger validation with debounce
+    if (newValue.trim()) {
+      debouncedValidate(newValue);
+    }
   };
 
   const handleFocus = () => setIsFocused(true);
-  const handleBlur = () => setIsFocused(false);
+  
+  const handleBlur = () => {
+    setIsFocused(false);
+    // Validate immediately on blur
+    if (inputValue.trim()) {
+      validateQuestion(inputValue);
+    }
+  };
 
   return (
     <motion.div
@@ -64,9 +93,11 @@ export const TextInputQuestion: React.FC<QuestionComponentProps> = ({
               placeholder="Enter your answer..."
               className={`
                 fantasy-input w-full text-lg py-4 px-6 text-center
-                ${error 
+                ${displayError 
                   ? 'border-red-500 focus:border-red-400' 
-                  : 'border-amber-700 focus:border-yellow-400'
+                  : isValid 
+                    ? 'border-green-500 focus:border-green-400'
+                    : 'border-amber-700 focus:border-yellow-400'
                 }
                 placeholder:text-slate-400 placeholder:italic
                 transition-all duration-300
@@ -105,18 +136,18 @@ export const TextInputQuestion: React.FC<QuestionComponentProps> = ({
           </div>
         </div>
 
-        {/* Error Message */}
-        {error && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="text-center p-3 bg-red-900/30 border border-red-600 rounded-lg"
-          >
-            <p className="text-red-300 font-medium">
-              ⚠️ {error}
-            </p>
-          </motion.div>
-        )}
+        {/* Validation Feedback */}
+        <div className="space-y-2">
+          <ErrorMessage error={displayError} />
+          <ValidationFeedback 
+            isValid={isValid && inputValue.trim().length > 0}
+            isValidating={isValidating}
+            successMessage={question.id === 'name' 
+              ? "A worthy name for a legendary hero! ✨" 
+              : "Your answer resonates with magical energy! ✨"
+            }
+          />
+        </div>
 
         {/* Helpful Hints */}
         <div className="text-center">

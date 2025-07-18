@@ -1,11 +1,14 @@
 'use client';
 
+import { useRouter } from 'next/navigation';
 import { LandingPage } from '@/components';
 
 export default function Home() {
+  const router = useRouter();
+
   const handleStartQuiz = () => {
-    // TODO: Navigate to quiz when quiz components are implemented
-    console.log('Starting quiz...');
+    // Navigate to the quiz page
+    router.push('/quiz');
   };
 
   return <LandingPage onStartQuiz={handleStartQuiz} />;

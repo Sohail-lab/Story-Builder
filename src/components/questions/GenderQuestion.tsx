@@ -3,6 +3,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { QuestionComponentProps } from '@/types';
+import { ErrorMessage, ValidationFeedback, useQuestionValidation } from '@/components/validation';
 
 export const GenderQuestion: React.FC<QuestionComponentProps> = ({
   question,
@@ -10,8 +11,21 @@ export const GenderQuestion: React.FC<QuestionComponentProps> = ({
   onChange,
   error
 }) => {
+  // Use validation hook
+  const {
+    validateQuestion,
+    isValid,
+    error: validationError
+  } = useQuestionValidation(question.id);
+
+  // Use validation error if available, otherwise use prop error
+  const displayError = validationError || error;
+
   const handleOptionChange = (selectedValue: string) => {
     onChange(selectedValue);
+    
+    // Validate immediately when option is selected
+    validateQuestion(selectedValue);
   };
 
   // Ensure only Male/Female options are available
@@ -125,18 +139,14 @@ export const GenderQuestion: React.FC<QuestionComponentProps> = ({
           ))}
         </div>
 
-        {/* Error Message */}
-        {error && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="text-center p-3 bg-red-900/30 border border-red-600 rounded-lg"
-          >
-            <p className="text-red-300 font-medium">
-              ⚠️ {error}
-            </p>
-          </motion.div>
-        )}
+        {/* Validation Feedback */}
+        <div className="space-y-2">
+          <ErrorMessage error={displayError} />
+          <ValidationFeedback 
+            isValid={isValid && value !== undefined && value !== ''}
+            successMessage="Your identity has been forged in starlight! ✨"
+          />
+        </div>
 
         {/* Additional Information */}
         <div className="text-center space-y-2">

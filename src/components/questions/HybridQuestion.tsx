@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { QuestionComponentProps } from '@/types';
+import { ErrorMessage, ValidationFeedback, useQuestionValidation } from '@/components/validation';
 
 export const HybridQuestion: React.FC<QuestionComponentProps> = ({
   question,
@@ -14,6 +15,18 @@ export const HybridQuestion: React.FC<QuestionComponentProps> = ({
   const [customText, setCustomText] = useState<string>('');
   const [showCustomInput, setShowCustomInput] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
+
+  // Use validation hook
+  const {
+    validateQuestion,
+    debouncedValidate,
+    isValidating,
+    isValid,
+    error: validationError
+  } = useQuestionValidation(question.id);
+
+  // Use validation error if available, otherwise use prop error
+  const displayError = validationError || error;
 
   // Initialize state from value prop
   useEffect(() => {
@@ -39,11 +52,14 @@ export const HybridQuestion: React.FC<QuestionComponentProps> = ({
       // Don't change the main value yet, wait for custom input
       if (customText) {
         onChange(customText);
+        validateQuestion(customText);
       }
     } else {
       setShowCustomInput(false);
       setCustomText('');
       onChange(option);
+      // Validate immediately when preset option is selected
+      validateQuestion(option);
     }
   };
 
@@ -52,11 +68,22 @@ export const HybridQuestion: React.FC<QuestionComponentProps> = ({
     setCustomText(newValue);
     if (selectedOption === 'custom') {
       onChange(newValue);
+      // Trigger validation with debounce for custom text
+      if (newValue.trim()) {
+        debouncedValidate(newValue);
+      }
     }
   };
 
   const handleFocus = () => setIsFocused(true);
-  const handleBlur = () => setIsFocused(false);
+  
+  const handleBlur = () => {
+    setIsFocused(false);
+    // Validate immediately on blur for custom text
+    if (selectedOption === 'custom' && customText.trim()) {
+      validateQuestion(customText);
+    }
+  };
 
   return (
     <motion.div
@@ -191,9 +218,11 @@ export const HybridQuestion: React.FC<QuestionComponentProps> = ({
                     placeholder="Enter your custom answer..."
                     className={`
                       fantasy-input w-full text-lg py-3 px-4 text-center
-                      ${error && selectedOption === 'custom'
+                      ${displayError && selectedOption === 'custom'
                         ? 'border-red-500 focus:border-red-400' 
-                        : 'border-amber-700 focus:border-yellow-400'
+                        : isValid && selectedOption === 'custom' && customText.trim()
+                          ? 'border-green-500 focus:border-green-400'
+                          : 'border-amber-700 focus:border-yellow-400'
                       }
                       placeholder:text-slate-400 placeholder:italic
                       transition-all duration-300
@@ -235,18 +264,18 @@ export const HybridQuestion: React.FC<QuestionComponentProps> = ({
           )}
         </AnimatePresence>
 
-        {/* Error Message */}
-        {error && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="text-center p-3 bg-red-900/30 border border-red-600 rounded-lg"
-          >
-            <p className="text-red-300 font-medium">
-              ⚠️ {error}
-            </p>
-          </motion.div>
-        )}
+        {/* Validation Feedback */}
+        <div className="space-y-2">
+          <ErrorMessage error={displayError} />
+          <ValidationFeedback 
+            isValid={isValid && ((selectedOption !== 'custom' && selectedOption !== '') || (selectedOption === 'custom' && customText.trim().length > 0))}
+            isValidating={isValidating && selectedOption === 'custom'}
+            successMessage={selectedOption === 'custom' 
+              ? "Your unique choice adds magic to the realm! ✨" 
+              : "A wise selection, adventurer! ✨"
+            }
+          />
+        </div>
 
         {/* Helpful Hints */}
         <div className="text-center">
