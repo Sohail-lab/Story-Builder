@@ -1,34 +1,53 @@
 'use client';
 
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { QuizEngine } from '@/components/quiz';
 import { StoryDisplay, StoryGenerator } from '@/components/story';
-import { StarfieldBackground, FloatingOrbs } from '@/components/visual-effects';
+import { StarfieldBackground, FloatingOrbs, PageTransition } from '@/components/visual-effects';
 import { usePlayerStore } from '@/stores/player-store';
 import { useStoryStore } from '@/stores/story-store';
+import { useUIStore } from '@/stores/ui-store';
 
 type PageState = 'quiz' | 'story-generation' | 'story-display';
 
 export default function QuizPage() {
   const [pageState, setPageState] = useState<PageState>('quiz');
+  const [isTransitioning, setIsTransitioning] = useState(false);
   const { getProfileForStoryGeneration, resetProfile } = usePlayerStore();
   const { generatedStory, resetStoryState } = useStoryStore();
+  const { setTransitioning } = useUIStore();
 
-  const handleQuizComplete = () => {
+  const handleQuizComplete = async () => {
     console.log('Quiz completed!');
     const profile = getProfileForStoryGeneration();
     
     if (profile) {
+      setIsTransitioning(true);
+      setTransitioning(true);
+      
+      // Longer delay to see the sparkles
+      await new Promise(resolve => setTimeout(resolve, 1200));
+      
       setPageState('story-generation');
+      setIsTransitioning(false);
+      setTransitioning(false);
     } else {
       alert('Please complete all required questions before generating your story.');
     }
   };
 
-  const handleStoryGenerated = () => {
+  const handleStoryGenerated = async () => {
     console.log('Story generated successfully!');
+    setIsTransitioning(true);
+    setTransitioning(true);
+    
+    // Longer delay to see the sparkles
+    await new Promise(resolve => setTimeout(resolve, 1200));
+    
     setPageState('story-display');
+    setIsTransitioning(false);
+    setTransitioning(false);
   };
 
   const handleStoryError = (error: string) => {
@@ -36,10 +55,19 @@ export default function QuizPage() {
     // Stay on story generation page to allow retry
   };
 
-  const handleStartNewQuest = () => {
+  const handleStartNewQuest = async () => {
+    setIsTransitioning(true);
+    setTransitioning(true);
+    
     resetProfile();
     resetStoryState();
+    
+    // Longer delay to see the sparkles
+    await new Promise(resolve => setTimeout(resolve, 1200));
+    
     setPageState('quiz');
+    setIsTransitioning(false);
+    setTransitioning(false);
   };
 
   const profile = getProfileForStoryGeneration();
@@ -53,15 +81,14 @@ export default function QuizPage() {
       {/* Main Content */}
       <div className="relative z-10 py-8">
         <div className="container mx-auto px-4">
-          <AnimatePresence mode="wait">
+          <PageTransition
+            isTransitioning={isTransitioning}
+            direction="fade"
+            duration={0.6}
+            sparkleCount={25}
+          >
             {pageState === 'quiz' && (
-              <motion.div
-                key="quiz"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.5 }}
-              >
+              <div>
                 <div className="text-center mb-8">
                   <h1 className="text-4xl md:text-5xl font-bold text-amber-100 mb-4">
                     Character Creation Quest
@@ -72,17 +99,11 @@ export default function QuizPage() {
                 </div>
                 
                 <QuizEngine onComplete={handleQuizComplete} />
-              </motion.div>
+              </div>
             )}
 
             {pageState === 'story-generation' && profile && (
-              <motion.div
-                key="story-generation"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.5 }}
-              >
+              <div>
                 <div className="text-center mb-8">
                   <h1 className="text-4xl md:text-5xl font-bold text-amber-100 mb-4">
                     Weaving Your Tale
@@ -98,17 +119,11 @@ export default function QuizPage() {
                   onError={handleStoryError}
                   autoGenerate={true}
                 />
-              </motion.div>
+              </div>
             )}
 
             {pageState === 'story-display' && generatedStory && (
-              <motion.div
-                key="story-display"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.5 }}
-              >
+              <div>
                 <div className="text-center mb-8">
                   <h1 className="text-4xl md:text-5xl font-bold text-amber-100 mb-4">
                     Your Adventure Awaits
@@ -140,18 +155,23 @@ export default function QuizPage() {
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    onClick={() => {
-                      resetStoryState(); // Clear the old story first
+                    onClick={async () => {
+                      setIsTransitioning(true);
+                      setTransitioning(true);
+                      resetStoryState();
+                      await new Promise(resolve => setTimeout(resolve, 1200));
                       setPageState('story-generation');
+                      setIsTransitioning(false);
+                      setTransitioning(false);
                     }}
                     className="px-8 py-3 bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-500 hover:to-amber-600 text-white font-semibold rounded-lg shadow-lg transition-all duration-200"
                   >
                     Generate New Story
                   </motion.button>
                 </div>
-              </motion.div>
+              </div>
             )}
-          </AnimatePresence>
+          </PageTransition>
         </div>
       </div>
     </div>

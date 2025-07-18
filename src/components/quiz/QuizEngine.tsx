@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useEffect, useMemo, useState } from 'react';
+import { motion } from 'framer-motion';
 import { useQuizStore } from '@/stores/quiz-store';
 import { usePlayerStore } from '@/stores/player-store';
 import { ProgressBar } from './ProgressBar';
@@ -13,6 +13,7 @@ import {
   GenderQuestion 
 } from '@/components/questions';
 import { FormProvider, ErrorBoundary } from '@/components/validation';
+import { QuestionTransition, LoadingSpinner } from '@/components/visual-effects';
 import { type Question } from '@/types';
 
 interface QuizEngineProps {
@@ -37,6 +38,9 @@ export function QuizEngine({ onComplete, className = '' }: QuizEngineProps) {
   } = useQuizStore();
 
   const { buildProfileFromAnswers } = usePlayerStore();
+  
+  // Track navigation direction for smooth transitions
+  const [navigationDirection, setNavigationDirection] = useState<'forward' | 'backward'>('forward');
 
   // Get current question and visible questions
   const currentQuestion = getCurrentQuestion();
@@ -72,12 +76,14 @@ export function QuizEngine({ onComplete, className = '' }: QuizEngineProps) {
   // Handle navigation
   const handleNext = () => {
     if (canProceedToNext()) {
+      setNavigationDirection('forward');
       nextQuestion();
     }
   };
 
   const handlePrevious = () => {
     if (canGoToPrevious()) {
+      setNavigationDirection('backward');
       previousQuestion();
     }
   };
@@ -126,10 +132,11 @@ export function QuizEngine({ onComplete, className = '' }: QuizEngineProps) {
   if (!processedQuestion) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="text-center">
-          <div className="text-amber-200 text-lg mb-2">Loading your quest...</div>
-          <div className="w-8 h-8 border-2 border-amber-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
-        </div>
+        <LoadingSpinner
+          size="medium"
+          variant="magical"
+          text="Loading your quest..."
+        />
       </div>
     );
   }
@@ -148,55 +155,44 @@ export function QuizEngine({ onComplete, className = '' }: QuizEngineProps) {
 
           {/* Question Container */}
           <div className="min-h-[500px] flex flex-col justify-center">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={currentQuestionIndex}
-                initial={{ opacity: 0, x: 50, scale: 0.95 }}
-                animate={{ opacity: 1, x: 0, scale: 1 }}
-                exit={{ opacity: 0, x: -50, scale: 0.95 }}
-                transition={{ 
-                  duration: 0.4, 
-                  ease: "easeInOut",
-                  type: "spring",
-                  stiffness: 100,
-                  damping: 15
-                }}
-                className="w-full"
-              >
-                {/* Question Header */}
-                <div className="text-center mb-8">
-                  <motion.h2 
-                    className="text-2xl md:text-3xl font-bold text-amber-100 mb-4 leading-relaxed"
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2, duration: 0.5 }}
-                  >
-                    {processedQuestion.text}
-                  </motion.h2>
-                  
-                  {processedQuestion.required && (
-                    <motion.p 
-                      className="text-amber-300/70 text-sm"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      transition={{ delay: 0.4, duration: 0.5 }}
-                    >
-                      * This question is required
-                    </motion.p>
-                  )}
-                </div>
-
-                {/* Question Component */}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
+            <QuestionTransition
+              questionKey={currentQuestionIndex}
+              direction={navigationDirection}
+              className="w-full"
+            >
+              {/* Question Header */}
+              <div className="text-center mb-8">
+                <motion.h2 
+                  className="text-2xl md:text-3xl font-bold text-amber-100 mb-4 leading-relaxed"
+                  initial={{ opacity: 0, y: -20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3, duration: 0.5 }}
-                  className="mb-8"
+                  transition={{ delay: 0.2, duration: 0.5 }}
                 >
-                  {renderQuestion(processedQuestion)}
-                </motion.div>
+                  {processedQuestion.text}
+                </motion.h2>
+                
+                {processedQuestion.required && (
+                  <motion.p 
+                    className="text-amber-300/70 text-sm"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.4, duration: 0.5 }}
+                  >
+                    * This question is required
+                  </motion.p>
+                )}
+              </div>
+
+              {/* Question Component */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3, duration: 0.5 }}
+                className="mb-8"
+              >
+                {renderQuestion(processedQuestion)}
               </motion.div>
-            </AnimatePresence>
+            </QuestionTransition>
           </div>
 
           {/* Navigation Controls */}

@@ -3,6 +3,7 @@
 import { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useStoryGenerationWithLoading, useStoryFallback } from '@/hooks/use-story-generation';
+import { StoryGenerationLoader } from '@/components/visual-effects';
 import { type PlayerProfile } from '@/types';
 
 interface StoryGeneratorProps {
@@ -72,60 +73,10 @@ export function StoryGenerator({
   
   if (isGenerating) {
     return (
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="flex flex-col items-center justify-center min-h-[400px] space-y-6"
-      >
-        {/* Magical loading spinner */}
-        <div className="relative">
-          <motion.div
-            className="w-16 h-16 border-4 border-amber-400/30 rounded-full"
-            animate={{ rotate: 360 }}
-            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-          />
-          <motion.div
-            className="absolute inset-0 w-16 h-16 border-4 border-transparent border-t-amber-400 rounded-full"
-            animate={{ rotate: -360 }}
-            transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-          />
-          <motion.div
-            className="absolute inset-2 w-12 h-12 bg-amber-400/20 rounded-full"
-            animate={{ 
-              scale: [1, 1.2, 1],
-              opacity: [0.5, 0.8, 0.5]
-            }}
-            transition={{ duration: 2, repeat: Infinity }}
-          />
-        </div>
-        
-        {/* Loading message */}
-        <div className="text-center space-y-2">
-          <motion.p
-            key={loadingMessage}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="text-lg font-medium text-amber-100"
-          >
-            {loadingMessage}
-          </motion.p>
-          
-          {/* Progress bar */}
-          <div className="w-64 h-2 bg-slate-700 rounded-full overflow-hidden">
-            <motion.div
-              className="h-full bg-gradient-to-r from-amber-400 to-amber-600"
-              initial={{ width: 0 }}
-              animate={{ width: `${loadingProgress}%` }}
-              transition={{ duration: 0.5 }}
-            />
-          </div>
-          
-          <p className="text-sm text-slate-400">
-            Crafting your personalized adventure...
-          </p>
-        </div>
-      </motion.div>
+      <StoryGenerationLoader
+        isVisible={true}
+        progress={loadingProgress}
+      />
     );
   }
   
