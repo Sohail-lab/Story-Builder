@@ -107,6 +107,8 @@ const config: Config = {
         '88': '22rem',
         '128': '32rem',
         '144': '36rem',
+        'safe-area-inset-bottom': 'env(safe-area-inset-bottom)',
+        'safe-area-inset-top': 'env(safe-area-inset-top)',
       },
       fontSize: {
         'fantasy-xs': ['0.75rem', { lineHeight: '1rem' }],
