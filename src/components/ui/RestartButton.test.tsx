@@ -185,5 +185,5 @@ export const manualTests = {
 
 // Make tests available globally for browser console testing
 if (typeof window !== 'undefined') {
-  (window as any).restartButtonTests = manualTests;
+  (window as typeof window & { restartButtonTests: typeof manualTests }).restartButtonTests = manualTests;
 }

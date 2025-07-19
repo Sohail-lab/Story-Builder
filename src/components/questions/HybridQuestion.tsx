@@ -4,6 +4,8 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { QuestionComponentProps } from '@/types';
 import { ErrorMessage, ValidationFeedback, useQuestionValidation } from '@/components/validation';
+import { MobileOptimizedCard, MobileOptimizedInput } from '@/components/layout';
+import { useMediaQuery } from '@/hooks';
 
 export const HybridQuestion: React.FC<QuestionComponentProps> = ({
   question,
@@ -14,7 +16,9 @@ export const HybridQuestion: React.FC<QuestionComponentProps> = ({
   const [selectedOption, setSelectedOption] = useState<string>('');
   const [customText, setCustomText] = useState<string>('');
   const [showCustomInput, setShowCustomInput] = useState(false);
-  const [isFocused, setIsFocused] = useState(false);
+
+  // Check if we're on mobile for optimizations
+  const isMobile = useMediaQuery('(max-width: 768px)');
 
   // Use validation hook
   const {
@@ -63,8 +67,7 @@ export const HybridQuestion: React.FC<QuestionComponentProps> = ({
     }
   };
 
-  const handleCustomTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newValue = e.target.value;
+  const handleCustomTextChange = (newValue: string) => {
     setCustomText(newValue);
     if (selectedOption === 'custom') {
       onChange(newValue);
@@ -75,10 +78,7 @@ export const HybridQuestion: React.FC<QuestionComponentProps> = ({
     }
   };
 
-  const handleFocus = () => setIsFocused(true);
-  
-  const handleBlur = () => {
-    setIsFocused(false);
+  const handleCustomInputFocus = () => {
     // Validate immediately on blur for custom text
     if (selectedOption === 'custom' && customText.trim()) {
       validateQuestion(customText);
@@ -86,11 +86,11 @@ export const HybridQuestion: React.FC<QuestionComponentProps> = ({
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      className="fantasy-card fantasy-starfield fantasy-orbs w-full max-w-2xl mx-auto"
+    <MobileOptimizedCard
+      variant="default"
+      enableHover={true}
+      enableTouchFeedback={true}
+      className="fantasy-starfield fantasy-orbs w-full max-w-2xl mx-auto"
     >
       <div className="space-y-6">
         {/* Question Text */}
@@ -199,66 +199,15 @@ export const HybridQuestion: React.FC<QuestionComponentProps> = ({
               className="overflow-hidden"
             >
               <div className="pt-4">
-                <motion.div
-                  animate={{
-                    scale: isFocused ? 1.02 : 1,
-                    boxShadow: isFocused 
-                      ? '0 0 20px rgba(255, 215, 0, 0.3)' 
-                      : '0 0 0px rgba(255, 215, 0, 0)'
-                  }}
-                  transition={{ duration: 0.3 }}
-                  className="relative"
-                >
-                  <input
-                    type="text"
-                    value={customText}
-                    onChange={handleCustomTextChange}
-                    onFocus={handleFocus}
-                    onBlur={handleBlur}
-                    placeholder="Enter your custom answer..."
-                    className={`
-                      fantasy-input w-full text-lg py-3 px-4 text-center
-                      ${displayError && selectedOption === 'custom'
-                        ? 'border-red-500 focus:border-red-400' 
-                        : isValid && selectedOption === 'custom' && customText.trim()
-                          ? 'border-green-500 focus:border-green-400'
-                          : 'border-amber-700 focus:border-yellow-400'
-                      }
-                      placeholder:text-slate-400 placeholder:italic
-                      transition-all duration-300
-                    `}
-                    maxLength={30}
-                  />
-                  
-                  {/* Magical Border Effect */}
-                  {isFocused && (
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      className="absolute inset-0 rounded-lg border-2 border-yellow-400 pointer-events-none"
-                      style={{
-                        background: 'linear-gradient(45deg, transparent, rgba(255, 215, 0, 0.1), transparent)',
-                        animation: 'shimmer 2s ease-in-out infinite'
-                      }}
-                    />
-                  )}
-                </motion.div>
-
-                {/* Character Count */}
-                <div className="flex justify-between items-center mt-2 text-sm fantasy-secondary">
-                  <span>
-                    {customText.length}/30 characters
-                  </span>
-                  {customText && (
-                    <motion.span
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      className="text-yellow-400"
-                    >
-                      ✨ Creative choice!
-                    </motion.span>
-                  )}
-                </div>
+                <MobileOptimizedInput
+                  value={customText}
+                  onChange={handleCustomTextChange}
+                  placeholder="Enter your custom answer..."
+                  maxLength={30}
+                  error={displayError && selectedOption === 'custom' ? displayError : undefined}
+                  success={isValid && selectedOption === 'custom' && customText.trim().length > 0}
+                  onBlur={handleCustomInputFocus}
+                />
               </div>
             </motion.div>
           )}
@@ -292,6 +241,6 @@ export const HybridQuestion: React.FC<QuestionComponentProps> = ({
         {/* Magical Divider */}
         <div className="fantasy-divider"></div>
       </div>
-    </motion.div>
+    </MobileOptimizedCard>
   );
 };

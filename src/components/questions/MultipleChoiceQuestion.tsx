@@ -4,6 +4,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { QuestionComponentProps } from '@/types';
 import { ErrorMessage, ValidationFeedback, useQuestionValidation } from '@/components/validation';
+import { MobileOptimizedCard } from '@/components/layout';
 
 export const MultipleChoiceQuestion: React.FC<QuestionComponentProps> = ({
   question,
@@ -29,11 +30,11 @@ export const MultipleChoiceQuestion: React.FC<QuestionComponentProps> = ({
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      className="fantasy-card fantasy-starfield fantasy-orbs w-full max-w-2xl mx-auto"
+    <MobileOptimizedCard
+      variant="default"
+      enableHover={true}
+      enableTouchFeedback={true}
+      className="fantasy-starfield fantasy-orbs w-full max-w-2xl mx-auto"
     >
       <div className="space-y-6">
         {/* Question Text */}
@@ -103,6 +104,6 @@ export const MultipleChoiceQuestion: React.FC<QuestionComponentProps> = ({
         {/* Magical Divider */}
         <div className="fantasy-divider"></div>
       </div>
-    </motion.div>
+    </MobileOptimizedCard>
   );
 };

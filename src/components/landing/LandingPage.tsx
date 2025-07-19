@@ -3,6 +3,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { StarfieldBackground, FloatingOrbs, AnimatedGradient, MagicalBorder } from '../visual-effects';
+import { ResponsiveLayout, ResponsiveContainer, ResponsiveGrid } from '../layout';
 
 interface LandingPageProps {
   onStartQuiz?: () => void;
@@ -16,15 +17,15 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStartQuiz }) => {
   };
 
   return (
-    <div className="relative min-h-screen overflow-hidden">
+    <ResponsiveLayout variant="page" enableMobileOptimizations={true}>
       {/* Background Effects */}
       <StarfieldBackground className="opacity-80" starCount={150} />
       <AnimatedGradient variant="aurora" intensity="medium" speed="normal" />
       <FloatingOrbs orbCount={8} />
 
       {/* Main Content */}
-      <div className="relative z-20 flex flex-col items-center justify-center min-h-screen px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-4xl mx-auto">
+      <ResponsiveContainer variant="default" enableMotion={true} className="flex flex-col items-center justify-center min-h-screen">
+        <div className="text-center w-full">
           {/* Hero Section */}
           <motion.div
             initial={{ opacity: 0, y: 50 }}
@@ -65,11 +66,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStartQuiz }) => {
             </motion.p>
 
             {/* Feature Highlights */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.8 }}
-              className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-12 max-w-2xl mx-auto"
+            <ResponsiveGrid
+              columns={{ xs: 1, sm: 3, md: 3, lg: 3 }}
+              gap="medium"
+              enableStagger={true}
+              className="mb-12 max-w-2xl mx-auto"
             >
               <div className="text-center">
                 <div className="text-fantasy-gold-luminous text-2xl mb-2">✨</div>
@@ -89,7 +90,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStartQuiz }) => {
                   Epic Adventures
                 </p>
               </div>
-            </motion.div>
+            </ResponsiveGrid>
           </motion.div>
 
           {/* Call-to-Action Section */}
@@ -153,6 +154,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStartQuiz }) => {
           </motion.div>
         </div>
 
+        </ResponsiveContainer>
+
         {/* Scroll Indicator */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -168,15 +171,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStartQuiz }) => {
             ✦
           </motion.div>
         </motion.div>
-      </div>
 
-      {/* Ambient Glow Effects */}
-      <div className="fixed inset-0 pointer-events-none z-10">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-fantasy-purple opacity-10 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-fantasy-gold-luminous opacity-10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
-        <div className="absolute top-1/2 right-1/3 w-64 h-64 bg-fantasy-emerald opacity-10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
-      </div>
-    </div>
+        {/* Ambient Glow Effects */}
+        <div className="fixed inset-0 pointer-events-none z-10">
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-fantasy-purple opacity-10 rounded-full blur-3xl animate-pulse" />
+          <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-fantasy-gold-luminous opacity-10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+          <div className="absolute top-1/2 right-1/3 w-64 h-64 bg-fantasy-emerald opacity-10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }} />
+        </div>
+    </ResponsiveLayout>
   );
 };
 
