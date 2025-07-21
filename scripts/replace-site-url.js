@@ -1,6 +1,5 @@
 const fs = require('fs');
 const path = require('path');
-require('dotenv').config();
 
 const robotsPath = path.join(__dirname, '../public/robots.txt');
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
