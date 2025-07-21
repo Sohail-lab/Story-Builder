@@ -41,22 +41,17 @@ export function QuizEngine({ onComplete, className = '' }: QuizEngineProps) {
 
   const { buildProfileFromAnswers } = usePlayerStore();
   
-  // Track navigation direction for smooth transitions
   const [navigationDirection, setNavigationDirection] = useState<'forward' | 'backward'>('forward');
   
-  // Check if we're on mobile for conditional rendering
   const isMobile = useMediaQuery('(max-width: 768px)');
 
-  // Get current question and visible questions
   const currentQuestion = getCurrentQuestion();
   const totalQuestions = getTotalQuestions();
   const isLastQuestion = currentQuestionIndex >= totalQuestions - 1;
 
-  // Handle conditional logic for romance partner options
   const processedQuestion = useMemo(() => {
     if (!currentQuestion) return null;
 
-    // Handle romance partner question - populate options based on gender
     if (currentQuestion.id === 'romanticPartner') {
       const gender = answers.gender;
       const partnerOptions = gender === 'Male' 
@@ -72,13 +67,11 @@ export function QuizEngine({ onComplete, className = '' }: QuizEngineProps) {
     return currentQuestion;
   }, [currentQuestion, answers.gender]);
 
-  // Handle answer changes
   const handleAnswerChange = (value: string) => {
     if (!processedQuestion) return;
     setAnswer(processedQuestion.id, value);
   };
 
-  // Handle navigation
   const handleNext = () => {
     if (canProceedToNext()) {
       setNavigationDirection('forward');
@@ -93,21 +86,16 @@ export function QuizEngine({ onComplete, className = '' }: QuizEngineProps) {
     }
   };
 
-  // Handle quiz completion
   const handleComplete = () => {
-    // Build player profile from answers
     buildProfileFromAnswers(answers);
     
-    // Mark quiz as complete
     completeQuiz();
     
-    // Call completion callback
     if (onComplete) {
       onComplete();
     }
   };
 
-  // Render the appropriate question component
   const renderQuestion = (question: Question) => {
     const commonProps = {
       question,
@@ -129,7 +117,6 @@ export function QuizEngine({ onComplete, className = '' }: QuizEngineProps) {
     }
   };
 
-  // Auto-scroll to top when question changes
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [currentQuestionIndex]);
@@ -156,7 +143,6 @@ export function QuizEngine({ onComplete, className = '' }: QuizEngineProps) {
           className={className}
         >
           <ResponsiveContainer variant="default" enableMotion={true}>
-            {/* Progress Bar - Hidden on mobile when using mobile navigation */}
             {!isMobile && (
               <ProgressBar
                 progress={progress}
@@ -166,14 +152,12 @@ export function QuizEngine({ onComplete, className = '' }: QuizEngineProps) {
               />
             )}
 
-            {/* Question Container */}
             <div className="min-h-[500px] flex flex-col justify-center">
               <QuestionTransition
                 questionKey={currentQuestionIndex}
                 direction={navigationDirection}
                 className="w-full"
               >
-                {/* Question Header */}
                 <div className="text-center mb-8">
                   <motion.h2 
                     className="text-2xl md:text-3xl font-bold text-amber-100 mb-4 leading-relaxed"
@@ -196,7 +180,6 @@ export function QuizEngine({ onComplete, className = '' }: QuizEngineProps) {
                   )}
                 </div>
 
-                {/* Question Component */}
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -208,7 +191,6 @@ export function QuizEngine({ onComplete, className = '' }: QuizEngineProps) {
               </QuestionTransition>
             </div>
 
-            {/* Desktop Navigation Controls */}
             {!isMobile && (
               <NavigationControls
                 canGoBack={canGoToPrevious()}
@@ -221,7 +203,6 @@ export function QuizEngine({ onComplete, className = '' }: QuizEngineProps) {
               />
             )}
 
-            {/* Debug Info (only in development) */}
             {process.env.NODE_ENV === 'development' && (
               <div className="mt-8 p-4 bg-slate-800/30 rounded-lg border border-slate-600/30 text-xs text-slate-400">
                 <div>Current Question: {currentQuestionIndex + 1}/{totalQuestions}</div>
@@ -234,7 +215,6 @@ export function QuizEngine({ onComplete, className = '' }: QuizEngineProps) {
             )}
           </ResponsiveContainer>
 
-          {/* Mobile Navigation */}
           {isMobile && (
             <MobileNavigation
               canGoBack={canGoToPrevious()}

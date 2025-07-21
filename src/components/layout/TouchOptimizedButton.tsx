@@ -14,6 +14,8 @@ interface TouchOptimizedButtonProps {
   fullWidth?: boolean;
   icon?: React.ReactNode;
   iconPosition?: 'left' | 'right';
+  ariaLabel?: string;
+  ariaDescribedBy?: string;
 }
 
 export const TouchOptimizedButton: React.FC<TouchOptimizedButtonProps> = ({
@@ -26,7 +28,9 @@ export const TouchOptimizedButton: React.FC<TouchOptimizedButtonProps> = ({
   className = '',
   fullWidth = false,
   icon,
-  iconPosition = 'left'
+  iconPosition = 'left',
+  ariaLabel,
+  ariaDescribedBy
 }) => {
   // Define size variants with touch-friendly dimensions
   const sizeVariants = {
@@ -83,6 +87,12 @@ export const TouchOptimizedButton: React.FC<TouchOptimizedButtonProps> = ({
       className={baseClasses}
       onClick={handleClick}
       disabled={disabled || loading}
+      type="button"
+      aria-label={ariaLabel}
+      aria-describedby={ariaDescribedBy}
+      aria-busy={loading ? 'true' : undefined}
+      aria-disabled={disabled || loading ? 'true' : undefined}
+      tabIndex={0}
       {...interactionProps}
     >
       {/* Loading Spinner */}

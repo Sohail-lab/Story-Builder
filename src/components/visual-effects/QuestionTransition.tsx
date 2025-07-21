@@ -88,7 +88,6 @@ export const QuestionTransition: React.FC<QuestionTransitionProps> = ({
             perspective: '1000px'
           }}
         >
-          {/* Magical Shimmer Effect */}
           <motion.div
             className="absolute inset-0 pointer-events-none rounded-lg"
             initial={{ opacity: 0 }}
@@ -104,7 +103,6 @@ export const QuestionTransition: React.FC<QuestionTransitionProps> = ({
             }}
           />
 
-          {/* Content */}
           <motion.div
             initial={{ filter: 'blur(2px)' }}
             animate={{ filter: 'blur(0px)' }}
@@ -113,7 +111,6 @@ export const QuestionTransition: React.FC<QuestionTransitionProps> = ({
             {children}
           </motion.div>
 
-          {/* Floating Particles for Transition */}
           {Array.from({ length: 6 }).map((_, index) => (
             <motion.div
               key={index}

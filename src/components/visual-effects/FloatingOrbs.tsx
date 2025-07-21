@@ -1,14 +1,13 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 interface FloatingOrbsProps {
-  className?: string;
   orbCount?: number;
+  className?: string;
 }
 
 interface Orb {
-  id: number;
   size: number;
   color: string;
   left: string;
@@ -18,12 +17,10 @@ interface Orb {
   glowIntensity: number;
 }
 
-export const FloatingOrbs: React.FC<FloatingOrbsProps> = ({
-  className = '',
-  orbCount = 6,
-}) => {
-  // Generate random orbs with different properties
-  const orbs: Orb[] = React.useMemo(() => {
+export const FloatingOrbs: React.FC<FloatingOrbsProps> = ({ orbCount = 6, className = '' }) => {
+  const [orbs, setOrbs] = useState<Orb[]>([]);
+
+  useEffect(() => {
     const orbColors = [
       'rgba(255, 215, 0, 0.4)', // Gold
       'rgba(139, 69, 19, 0.3)', // Copper
@@ -32,25 +29,25 @@ export const FloatingOrbs: React.FC<FloatingOrbsProps> = ({
       'rgba(220, 38, 38, 0.3)', // Crimson
       'rgba(229, 231, 235, 0.2)', // Silver
     ];
-
-    return Array.from({ length: orbCount }, (_, index) => ({
-      id: index,
+    const generatedOrbs: Orb[] = Array.from({ length: orbCount }).map((_, index) => ({
       size: Math.random() * 60 + 30, // 30-90px
-      color: orbColors[index % orbColors.length] || 'rgba(255, 215, 0, 0.4)', // Fallback color
+      color: orbColors[index % orbColors.length] || 'rgba(255, 215, 0, 0.4)',
       left: `${Math.random() * 80 + 10}%`, // 10-90%
       top: `${Math.random() * 80 + 10}%`, // 10-90%
       animationDuration: `${Math.random() * 4 + 3}s`, // 3-7s
       animationDelay: `${Math.random() * 2}s`, // 0-2s delay
       glowIntensity: Math.random() * 20 + 10, // 10-30px glow
     }));
+    setOrbs(generatedOrbs);
   }, [orbCount]);
 
+  if (orbs.length === 0) return null;
+
   return (
-    <div className={`fixed inset-0 pointer-events-none z-10 overflow-hidden ${className}`}>
-      {orbs.map((orb) => (
+    <div className={`pointer-events-none fixed inset-0 z-0 ${className}`} aria-hidden="true">
+      {orbs.map((orb, i) => (
         <div
-          key={orb.id}
-          className="absolute rounded-full animate-float"
+          key={i}
           style={{
             width: `${orb.size}px`,
             height: `${orb.size}px`,
@@ -61,32 +58,19 @@ export const FloatingOrbs: React.FC<FloatingOrbsProps> = ({
             animationDuration: orb.animationDuration,
             animationDelay: orb.animationDelay,
           }}
+          className="absolute rounded-full animate-float"
         />
       ))}
-      
-      {/* Additional CSS for enhanced floating animation */}
       <style jsx>{`
         @keyframes float {
-          0%, 100% { 
-            transform: translateY(0px) translateX(0px) scale(1);
-            opacity: 0.6;
-          }
-          25% { 
-            transform: translateY(-15px) translateX(5px) scale(1.05);
-            opacity: 0.8;
-          }
-          50% { 
-            transform: translateY(-10px) translateX(-8px) scale(0.95);
-            opacity: 1;
-          }
-          75% { 
-            transform: translateY(-20px) translateX(3px) scale(1.02);
-            opacity: 0.7;
-          }
+          0% { transform: translateY(0px) scale(1); }
+          50% { transform: translateY(-30px) scale(1.05); }
+          100% { transform: translateY(0px) scale(1); }
         }
-        
         .animate-float {
-          animation: float 4s ease-in-out infinite;
+          animation-name: float;
+          animation-timing-function: ease-in-out;
+          animation-iteration-count: infinite;
         }
       `}</style>
     </div>

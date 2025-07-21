@@ -56,21 +56,6 @@ export default function QuizPage() {
     // Stay on story generation page to allow retry
   };
 
-  const handleStartNewQuest = async () => {
-    setIsTransitioning(true);
-    setTransitioning(true);
-    
-    resetProfile();
-    resetStoryState();
-    
-    // Longer delay to see the sparkles
-    await new Promise(resolve => setTimeout(resolve, 1200));
-    
-    setPageState('quiz');
-    setIsTransitioning(false);
-    setTransitioning(false);
-  };
-
   const profile = getProfileForStoryGeneration();
 
   return (
@@ -136,7 +121,6 @@ export default function QuizPage() {
                 
                 <StoryDisplay
                   story={generatedStory}
-                  onComplete={() => console.log('Story display completed')}
                   autoStart={true}
                   typewriterSpeed={25}
                   className="mb-8"

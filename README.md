@@ -1,60 +1,140 @@
-# Fantasy Story-Building Quiz Website
+# Fantasy Story Builder
 
-An interactive fantasy story-building quiz website where players answer questions to help AI construct a personalized fantasy world and narrative.
+An interactive, AI-powered fantasy story-building quiz. Players answer questions to help generate a personalized fantasy world and narrative.
+
+---
+
+## Features
+
+- **Interactive Character Creation**: Dynamic quiz for building your fantasy persona.
+- **AI-Powered Story Generation**: Personalized stories crafted from your answers.
+- **Rich Fantasy Theme**: Custom fonts, magical effects, and responsive design.
+- **Accessibility**: ARIA labels, semantic HTML, and keyboard navigation.
+- **SEO Optimized**: Open Graph, Twitter cards, sitemap, robots.txt, and structured data.
+- **Performance**: Code splitting, lazy loading, and image optimization.
+- **TypeScript**: Strict typing throughout.
+- **Error Handling**: Robust error boundaries and validation.
+
+---
+
+## Tech Stack
+
+- **Framework**: Next.js 15 (App Router)
+- **Styling**: Tailwind CSS v4, custom fantasy theme
+- **Animation**: Framer Motion
+- **State**: Zustand
+- **Forms/Validation**: React Hook Form + Zod
+- **AI**: Google Generative AI
+- **TypeScript**: Strict mode
+
+---
 
 ## Project Structure
 
 ```
 src/
-├── app/                 # Next.js App Router pages
-├── components/          # React components organized by feature
-├── hooks/              # Custom React hooks
-├── stores/             # Zustand store definitions
-├── types/              # TypeScript type definitions
-└── utils/              # Utility functions and helpers
+├── app/           # Next.js App Router pages & API routes
+├── components/    # UI components (by feature)
+├── hooks/         # Custom React hooks
+├── services/      # API and AI service logic
+├── stores/        # Zustand state stores
+├── types/         # TypeScript types
+├── utils/         # Utility functions
+└── styles/        # Theme and global styles
 ```
 
-## Tech Stack
-
-- **Framework**: Next.js 15.4.1 with App Router
-- **Styling**: Tailwind CSS v4 with custom fantasy theme
-- **Animations**: Framer Motion v12.23.6
-- **State Management**: Zustand v5.0.6
-- **Forms**: React Hook Form v7.60.0 with Zod v4.0.5 validation
-- **TypeScript**: Strict mode with enhanced type checking
-
-## Fantasy Theme
-
-The application features a comprehensive fantasy theme with:
-- Deep midnight blues and rich purples for mystical depth
-- Warm copper and antique gold accents
-- Custom CSS animations for magical effects
-- Fantasy typography with Cinzel serif font
-- Responsive design optimized for all devices
+---
 
 ## Getting Started
 
-First, run the development server:
+1. **Install dependencies:**
+   ```bash
+   npm install
+   ```
 
-```bash
-npm run dev
-```
+2. **Set up environment variables:**
+   - Copy `.env` and set your site URL:
+     ```
+     NEXT_PUBLIC_SITE_URL=https://yourdomain.com
+     ```
+   - This is used for SEO, sitemap, and robots.txt.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+3. **Run the development server:**
+   ```bash
+   npm run dev
+   ```
+   Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-## Build
+---
 
-To create a production build:
+## Production Build & Deployment
 
-```bash
-npm run build
-```
+1. **Build the app:**
+   ```bash
+   npm run build
+   ```
+   - After build, the `postbuild` script will automatically update `public/robots.txt` with your site URL.
 
-## Features
+2. **Start the server:**
+   ```bash
+   npm start
+   ```
 
-- Interactive character creation questionnaire
-- AI-powered story generation
-- Fantasy-themed responsive design
-- Smooth animations and transitions
-- TypeScript with strict type checking
-- Comprehensive error handling
+3. **SEO & Robots:**
+   - `public/robots.txt` and the dynamic `/sitemap.xml` are automatically configured for your domain.
+   - Update `NEXT_PUBLIC_SITE_URL` in `.env` for each environment (local, staging, production).
+
+---
+
+## SEO & Accessibility
+
+- **Meta Tags**: Open Graph, Twitter, favicon, and theme color.
+- **Structured Data**: JSON-LD for rich search results.
+- **Sitemap**: `/sitemap.xml` is generated dynamically.
+- **robots.txt**: Automatically updated at build time.
+- **Accessibility**: ARIA labels, keyboard navigation, and semantic HTML.
+
+---
+
+## Scripts
+
+- `npm run dev` – Start development server
+- `npm run build` – Build for production
+- `npm start` – Start production server
+- `npm run lint` – Lint code
+- `postbuild` – (runs automatically) Updates robots.txt with your site URL
+
+---
+
+## Customization
+
+- **Add/Remove Quiz Questions**: Edit question components in `src/components/questions/`.
+- **AI Story Logic**: See `src/services/gemini-service.ts` and `src/services/story-service.ts`.
+- **Theme**: Customize Tailwind and theme in `src/styles/theme.ts` and `globals.css`.
+
+---
+
+## Deployment to Vercel
+
+You can deploy this project to [Vercel](https://vercel.com/) for fast, serverless hosting.
+
+**Steps:**
+1. Push your code to GitHub, GitLab, or Bitbucket.
+2. Import your repository into Vercel.
+3. Set the environment variable `NEXT_PUBLIC_SITE_URL` in the Vercel dashboard to your production domain (e.g., `https://yourdomain.com`).
+4. Vercel will handle builds, deployments, and serverless hosting automatically.
+5. [Optional] Set up a custom domain in Vercel for your site.
+
+*Add any additional Vercel-specific notes or custom steps here as needed.*
+
+---
+
+## Contributing
+
+Pull requests and issues are welcome! Please open an issue to discuss major changes.
+
+---
+
+## License
+
+[MIT](LICENSE)

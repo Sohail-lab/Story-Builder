@@ -22,22 +22,18 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   static getDerivedStateFromError(error: Error): State {
-    // Update state so the next render will show the fallback UI
     return { hasError: true, error };
   }
 
   override componentDidCatch(error: Error, errorInfo: ErrorInfo) {
-    // Log the error to console in development
     if (process.env.NODE_ENV === 'development') {
       console.error('ErrorBoundary caught an error:', error, errorInfo);
     }
 
-    // Call the optional error handler
     if (this.props.onError) {
       this.props.onError(error, errorInfo);
     }
 
-    // Update state with error info
     this.setState({
       error,
       errorInfo
@@ -50,12 +46,10 @@ export class ErrorBoundary extends Component<Props, State> {
 
   override render() {
     if (this.state.hasError) {
-      // Custom fallback UI
       if (this.props.fallback) {
         return this.props.fallback;
       }
 
-      // Default fantasy-themed error UI
       return (
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
@@ -65,7 +59,6 @@ export class ErrorBoundary extends Component<Props, State> {
         >
           <div className="fantasy-card fantasy-starfield w-full max-w-2xl mx-auto text-center">
             <div className="space-y-6">
-              {/* Magical Error Icon */}
               <motion.div
                 animate={{ 
                   rotate: [0, -10, 10, 0],
@@ -81,7 +74,6 @@ export class ErrorBoundary extends Component<Props, State> {
                 🔮💥
               </motion.div>
 
-              {/* Error Title */}
               <motion.h2
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -91,7 +83,6 @@ export class ErrorBoundary extends Component<Props, State> {
                 A Magical Disturbance Has Occurred!
               </motion.h2>
 
-              {/* Error Description */}
               <motion.p
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -102,7 +93,6 @@ export class ErrorBoundary extends Component<Props, State> {
                 this is but a temporary setback in your quest!
               </motion.p>
 
-              {/* Error Details (Development Only) */}
               {process.env.NODE_ENV === 'development' && this.state.error && (
                 <motion.details
                   initial={{ opacity: 0 }}
@@ -135,7 +125,6 @@ export class ErrorBoundary extends Component<Props, State> {
                 </motion.details>
               )}
 
-              {/* Action Buttons */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -172,10 +161,8 @@ export class ErrorBoundary extends Component<Props, State> {
                 </motion.button>
               </motion.div>
 
-              {/* Magical Divider */}
               <div className="fantasy-divider"></div>
 
-              {/* Helpful Message */}
               <motion.p
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -195,7 +182,6 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 }
 
-// Higher-order component for easier usage
 export function withErrorBoundary<P extends object>(
   Component: React.ComponentType<P>,
   errorBoundaryProps?: Omit<Props, 'children'>

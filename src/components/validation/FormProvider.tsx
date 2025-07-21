@@ -4,7 +4,6 @@ import React, { createContext, useContext, ReactNode } from 'react';
 import { z } from 'zod';
 import { getValidationSchemaForQuestion } from '@/utils/validation';
 
-// Form context type
 interface FormContextType {
   validateField: (questionId: string, value: string) => Promise<string | undefined>;
   isFieldValid: (questionId: string) => boolean;
@@ -15,7 +14,6 @@ interface FormContextType {
 
 const FormContext = createContext<FormContextType | null>(null);
 
-// Hook to use form context
 export const useFormValidation = () => {
   const context = useContext(FormContext);
   if (!context) {
@@ -33,7 +31,6 @@ export const FormProvider: React.FC<FormProviderProps> = ({
   children, 
   onValidationChange 
 }) => {
-  // Simple validation state management without React Hook Form
   const [fieldErrors, setFieldErrors] = React.useState<Record<string, string>>({});
   const [fieldValidStates, setFieldValidStates] = React.useState<Record<string, boolean>>({});
 
@@ -42,20 +39,18 @@ export const FormProvider: React.FC<FormProviderProps> = ({
       const schema = getValidationSchemaForQuestion(questionId);
       await schema.parseAsync(value);
       
-      // Clear any existing error for this field
       setFieldErrors(prev => {
         const newErrors = { ...prev };
         delete newErrors[questionId];
         return newErrors;
       });
       
-      // Mark field as valid
       setFieldValidStates(prev => ({
         ...prev,
         [questionId]: true
       }));
       
-      return undefined; // No error
+      return undefined;
     } catch (error) {
       let errorMessage = 'Invalid input';
       
@@ -63,13 +58,11 @@ export const FormProvider: React.FC<FormProviderProps> = ({
         errorMessage = error.issues[0]?.message || 'Invalid input';
       }
       
-      // Set error for this field
       setFieldErrors(prev => ({
         ...prev,
         [questionId]: errorMessage
       }));
       
-      // Mark field as invalid
       setFieldValidStates(prev => ({
         ...prev,
         [questionId]: false
@@ -126,7 +119,6 @@ export const FormProvider: React.FC<FormProviderProps> = ({
   );
 };
 
-// Hook for individual question validation
 export const useQuestionValidation = (questionId: string) => {
   const { validateField, isFieldValid, getFieldError, clearFieldError } = useFormValidation();
   const [isValidating, setIsValidating] = React.useState(false);
@@ -155,7 +147,7 @@ export const useQuestionValidation = (questionId: string) => {
       clearTimeout(timeoutId);
       timeoutId = setTimeout(() => {
         validateQuestion(value);
-      }, 300); // 300ms debounce
+      }, 300);
     };
   }, [validateQuestion]);
 

@@ -1,28 +1,19 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeftIcon, ChevronRightIcon, BookOpenIcon, PlayIcon, PauseIcon } from '@heroicons/react/24/outline';
-import { RestartButton } from '@/components/ui';
 import { type StoryResponse } from '@/types';
 
 interface StoryDisplayProps {
   story: StoryResponse;
-  onComplete?: () => void;
   autoStart?: boolean;
   typewriterSpeed?: number;
   className?: string;
 }
 
-interface StorySection {
-  title: string;
-  content: string;
-  delay: number;
-}
-
 export function StoryDisplay({ 
   story, 
-  onComplete, 
   autoStart = true, 
   typewriterSpeed = 30,
   className = ''
@@ -36,8 +27,7 @@ export function StoryDisplay({
   
   const typewriterRef = useRef<NodeJS.Timeout | null>(null);
   
-  // Format story into sections
-  const storySections: StorySection[] = [
+  const storySections = useMemo(() => ([
     {
       title: "Your Character",
       content: story.characterIntroduction,
@@ -63,10 +53,9 @@ export function StoryDisplay({
       content: story.suspensefulEnding,
       delay: 1500
     }
-  ];
+  ]), [story]);
   
-  // Start typewriter effect
-  const startTypewriter = (text: string, sectionIndex: number, onComplete?: () => void) => {
+  const startTypewriter = useCallback((text: string, sectionIndex: number, onComplete?: () => void) => {
     if (isPaused) return;
     
     setIsTyping(true);
@@ -88,9 +77,8 @@ export function StoryDisplay({
     };
     
     typeNextChar();
-  };
+  }, [isPaused, typewriterSpeed]);
   
-  // Navigate to specific section
   const goToSection = (index: number) => {
     if (typewriterRef.current) {
       clearTimeout(typewriterRef.current);
@@ -107,21 +95,18 @@ export function StoryDisplay({
     }
   };
   
-  // Navigate to next section
   const nextSection = () => {
     if (currentSectionIndex < storySections.length - 1) {
       goToSection(currentSectionIndex + 1);
     }
   };
   
-  // Navigate to previous section
   const previousSection = () => {
     if (currentSectionIndex > 0) {
       goToSection(currentSectionIndex - 1);
     }
   };
   
-  // Toggle typewriter mode
   const toggleTypewriter = () => {
     if (isTyping) {
       setIsPaused(!isPaused);
@@ -133,23 +118,19 @@ export function StoryDisplay({
     }
   };
   
-  // Switch to full story view
   const showFullStory = () => {
     setViewMode('full');
   };
   
-  // Switch to section navigation view
   const showSectionView = () => {
     setViewMode('sections');
   };
   
-  // Switch back to typewriter view
   const showTypewriterView = () => {
     setViewMode('typewriter');
     setIsPaused(false);
   };
   
-  // Initialize typewriter on mount
   useEffect(() => {
     if (autoStart && viewMode === 'typewriter' && storySections.length > 0) {
       const firstSection = storySections[0];
@@ -163,14 +144,11 @@ export function StoryDisplay({
         clearTimeout(typewriterRef.current);
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [autoStart, typewriterSpeed, viewMode]);
+  }, [autoStart, typewriterSpeed, viewMode, startTypewriter, storySections]);
   
-  // Full story view
   if (viewMode === 'full') {
     return (
       <div className={`relative max-w-4xl mx-auto ${className}`}>
-        {/* View mode controls */}
         <div className="flex justify-center mb-6 space-x-2">
           <motion.button
             whileHover={{ scale: 1.05 }}
@@ -203,11 +181,9 @@ export function StoryDisplay({
     );
   }
   
-  // Section navigation view
   if (viewMode === 'sections') {
     return (
       <div className={`relative max-w-4xl mx-auto ${className}`}>
-        {/* View mode controls */}
         <div className="flex justify-center mb-6 space-x-2">
           <motion.button
             whileHover={{ scale: 1.05 }}
@@ -235,7 +211,6 @@ export function StoryDisplay({
           </motion.button>
         </div>
         
-        {/* Section navigation */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
           {storySections.map((section, index) => (
             <motion.button
@@ -260,7 +235,6 @@ export function StoryDisplay({
           ))}
         </div>
         
-        {/* Current section display */}
         <motion.div
           key={currentSectionIndex}
           initial={{ opacity: 0, y: 20 }}
@@ -275,7 +249,6 @@ export function StoryDisplay({
             {storySections[currentSectionIndex]?.content}
           </p>
           
-          {/* Navigation controls */}
           <div className="flex justify-between items-center mt-8">
             <motion.button
               whileHover={{ scale: 1.05 }}
@@ -316,7 +289,6 @@ export function StoryDisplay({
     );
   }
   
-  // Typewriter view (default)
   const currentSection = storySections[currentSectionIndex];
   
   if (!currentSection) {
@@ -325,7 +297,6 @@ export function StoryDisplay({
   
   return (
     <div className={`relative max-w-4xl mx-auto ${className}`}>
-      {/* View mode controls */}
       <div className="flex justify-center mb-6 space-x-2">
         <motion.button
           className="flex items-center gap-2 px-4 py-2 bg-amber-600/80 text-white font-medium rounded-lg border border-amber-500"
@@ -353,26 +324,21 @@ export function StoryDisplay({
         </motion.button>
       </div>
       
-      {/* Ambient background effects */}
       <div className="absolute inset-0 -z-10">
         <div className="absolute inset-0 bg-gradient-to-br from-slate-900/50 via-purple-900/20 to-amber-900/30 rounded-2xl" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-amber-400/5 via-transparent to-transparent rounded-2xl" />
       </div>
       
-      {/* Story container */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         className="relative bg-slate-800/40 backdrop-blur-sm border border-amber-400/20 rounded-2xl p-6 md:p-8 lg:p-12 shadow-2xl"
       >
-        {/* Decorative border glow */}
         <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-amber-400/20 via-purple-400/20 to-amber-400/20 p-[1px]">
           <div className="w-full h-full bg-slate-800/80 rounded-2xl" />
         </div>
         
-        {/* Content */}
         <div className="relative z-10">
-          {/* Section title */}
           <AnimatePresence mode="wait">
             <motion.div
               key={currentSectionIndex}
@@ -388,7 +354,6 @@ export function StoryDisplay({
             </motion.div>
           </AnimatePresence>
           
-          {/* Story text with typewriter effect */}
           <div className="prose prose-lg md:prose-xl max-w-none">
             <motion.div
               key={currentSectionIndex}
@@ -407,12 +372,10 @@ export function StoryDisplay({
                 )}
               </p>
               
-              {/* Ambient glow effect around text */}
               <div className="absolute inset-0 bg-gradient-to-r from-amber-400/5 via-purple-400/5 to-amber-400/5 rounded-lg blur-xl -z-10" />
             </motion.div>
           </div>
           
-          {/* Progress indicator */}
           <div className="mt-8 flex justify-center items-center space-x-2">
             {storySections.map((_, index) => (
               <motion.button
@@ -432,7 +395,6 @@ export function StoryDisplay({
             ))}
           </div>
           
-          {/* Typewriter controls */}
           <div className="flex justify-center mt-6 space-x-4">
             <motion.button
               whileHover={{ scale: 1.05 }}
@@ -483,7 +445,6 @@ export function StoryDisplay({
   );
 }
 
-// Simplified version for quick story display without typewriter
 export function StoryDisplayStatic({ 
   story, 
   className = '' 
@@ -509,7 +470,6 @@ export function StoryDisplayStatic({
           transition={{ delay: index * 0.2 }}
           className="relative bg-slate-800/40 backdrop-blur-sm border border-amber-400/20 rounded-xl p-6 md:p-8"
         >
-          {/* Section glow effect */}
           <div className="absolute inset-0 bg-gradient-to-r from-amber-400/10 via-purple-400/10 to-amber-400/10 rounded-xl blur-xl -z-10" />
           
           <h3 className="text-xl md:text-2xl font-bold bg-gradient-to-r from-amber-400 to-amber-300 bg-clip-text text-transparent mb-4">
@@ -532,20 +492,6 @@ export function StoryDisplayStatic({
         <p className="text-amber-400 font-medium text-lg mb-6">
           Your adventure awaits your next choice...
         </p>
-        
-        {/* Restart button for story completion */}
-        <RestartButton
-          variant="primary"
-          size="lg"
-          confirmationTitle="Begin a New Quest?"
-          confirmationMessage="Your current adventure has reached its conclusion. Would you like to create a completely new character and embark on a fresh journey?"
-          onRestart={() => {
-            // Navigate to home page for a fresh start
-            if (typeof window !== 'undefined') {
-              window.location.href = '/';
-            }
-          }}
-        />
       </motion.div>
     </div>
   );
