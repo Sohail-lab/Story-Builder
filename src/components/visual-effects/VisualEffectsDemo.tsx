@@ -15,21 +15,16 @@ export const VisualEffectsDemo: React.FC = () => {
     gradient: true,
     border: true,
   });
-
   const [gradientVariant, setGradientVariant] = useState<'aurora' | 'mystical' | 'ethereal' | 'cosmic'>('aurora');
   const [borderVariant, setBorderVariant] = useState<'ornate' | 'simple' | 'runes' | 'elegant'>('ornate');
   const [borderColor, setBorderColor] = useState<'gold' | 'purple' | 'emerald' | 'silver' | 'crimson'>('gold');
 
   const toggleEffect = (effect: keyof typeof activeEffects) => {
-    setActiveEffects(prev => ({
-      ...prev,
-      [effect]: !prev[effect],
-    }));
+    setActiveEffects(prev => ({ ...prev, [effect]: !prev[effect] }));
   };
 
   return (
     <div className="min-h-screen relative overflow-hidden">
-      {/* Background Effects */}
       {activeEffects.starfield && <StarfieldBackground />}
       {activeEffects.orbs && <FloatingOrbs />}
       {activeEffects.gradient && (
@@ -39,10 +34,7 @@ export const VisualEffectsDemo: React.FC = () => {
           speed="normal"
         />
       )}
-
-      {/* Demo Content */}
       <div className="relative z-20 p-8 space-y-8">
-        {/* Controls Panel */}
         <MagicalBorder
           variant="simple"
           glowColor="silver"
@@ -52,9 +44,7 @@ export const VisualEffectsDemo: React.FC = () => {
           <h1 className="fantasy-heading text-3xl mb-6 text-center">
             Visual Effects Demo
           </h1>
-          
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {/* Effect Toggles */}
             <div className="space-y-4">
               <h3 className="fantasy-heading text-lg">Toggle Effects</h3>
               {Object.entries(activeEffects).map(([effect, isActive]) => (
@@ -69,8 +59,6 @@ export const VisualEffectsDemo: React.FC = () => {
                 </label>
               ))}
             </div>
-
-            {/* Gradient Variants */}
             <div className="space-y-4">
               <h3 className="fantasy-heading text-lg">Gradient Style</h3>
               {(['aurora', 'mystical', 'ethereal', 'cosmic'] as const).map((variant) => (
@@ -86,8 +74,6 @@ export const VisualEffectsDemo: React.FC = () => {
                 </label>
               ))}
             </div>
-
-            {/* Border Variants */}
             <div className="space-y-4">
               <h3 className="fantasy-heading text-lg">Border Style</h3>
               {(['ornate', 'simple', 'runes', 'elegant'] as const).map((variant) => (
@@ -103,8 +89,6 @@ export const VisualEffectsDemo: React.FC = () => {
                 </label>
               ))}
             </div>
-
-            {/* Border Colors */}
             <div className="space-y-4">
               <h3 className="fantasy-heading text-lg">Border Color</h3>
               {(['gold', 'purple', 'emerald', 'silver', 'crimson'] as const).map((color) => (
@@ -121,100 +105,61 @@ export const VisualEffectsDemo: React.FC = () => {
               ))}
             </div>
           </div>
-        </MagicalBorder>
-
-        {/* Sample Content Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
-          {/* Card 1 - Ornate Border */}
           {activeEffects.border && (
             <MagicalBorder
               variant={borderVariant}
               glowColor={borderColor}
               animated={true}
-              thickness="medium"
+              className="mt-8"
             >
-              <h3 className="fantasy-heading text-xl mb-4">Magical Border</h3>
-              <p className="fantasy-body">
-                This card demonstrates the MagicalBorder component with ornate styling, 
-                animated glow effects, and customizable colors.
-              </p>
+              <div className="p-8 text-center">
+                <h2 className="fantasy-heading text-2xl mb-2">Ornate Border Example</h2>
+                <p className="fantasy-body text-base">
+                  This card uses the <b>Ornate</b> border variant with a glowing <b>{borderColor}</b> effect.
+                </p>
+              </div>
             </MagicalBorder>
           )}
-
-          {/* Card 2 - Simple Border */}
           {activeEffects.border && (
             <MagicalBorder
               variant="simple"
-              glowColor="purple"
+              glowColor={borderColor}
               animated={false}
-              thickness="thick"
+              className="mt-8"
             >
-              <h3 className="fantasy-heading text-xl mb-4">Simple Style</h3>
-              <p className="fantasy-body">
-                A simpler border variant with clean lines and subtle glow effects 
-                for more minimalist designs.
-              </p>
+              <div className="p-8 text-center">
+                <h2 className="fantasy-heading text-2xl mb-2">Simple Border Example</h2>
+                <p className="fantasy-body text-base">
+                  This card uses the <b>Simple</b> border variant with a glowing <b>{borderColor}</b> effect.
+                </p>
+              </div>
             </MagicalBorder>
           )}
-
-          {/* Card 3 - Runes Border */}
           {activeEffects.border && (
             <MagicalBorder
               variant="runes"
-              glowColor="emerald"
+              glowColor={borderColor}
               animated={true}
-              thickness="thin"
+              className="mt-8"
             >
-              <h3 className="fantasy-heading text-xl mb-4">Runic Style</h3>
-              <p className="fantasy-body">
-                Dashed borders with mystical appearance, perfect for magical 
-                content and ancient wisdom displays.
-              </p>
+              <div className="p-8 text-center">
+                <h2 className="fantasy-heading text-2xl mb-2">Runes Border Example</h2>
+                <p className="fantasy-body text-base">
+                  This card uses the <b>Runes</b> border variant with a glowing <b>{borderColor}</b> effect.
+                </p>
+              </div>
             </MagicalBorder>
           )}
-        </div>
-
-        {/* Effect Descriptions */}
-        <MagicalBorder
-          variant="elegant"
-          glowColor="gold"
-          className="max-w-4xl mx-auto"
-        >
-          <h2 className="fantasy-heading text-2xl mb-6 text-center">
-            Visual Effects Components
-          </h2>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <h3 className="fantasy-heading text-lg mb-3">StarfieldBackground</h3>
-              <p className="fantasy-body mb-4">
-                Creates an animated starfield with twinkling stars using HTML5 Canvas. 
-                Features customizable star count, twinkle speed, and glow effects.
-              </p>
-              
-              <h3 className="fantasy-heading text-lg mb-3">FloatingOrbs</h3>
-              <p className="fantasy-body">
-                Generates floating magical orbs with different colors and sizes. 
-                Each orb has its own animation timing and glow intensity.
-              </p>
-            </div>
-            
-            <div>
-              <h3 className="fantasy-heading text-lg mb-3">AnimatedGradient</h3>
-              <p className="fantasy-body mb-4">
-                Creates aurora-like gradient effects with multiple variants: 
-                aurora, mystical, ethereal, and cosmic. Features smooth animations 
-                and customizable intensity.
-              </p>
-              
-              <h3 className="fantasy-heading text-lg mb-3">MagicalBorder</h3>
-              <p className="fantasy-body">
-                Wraps content with ornate fantasy borders. Supports multiple 
-                variants, colors, and animation states for versatile styling.
-              </p>
-            </div>
-          </div>
         </MagicalBorder>
+        <div className="mt-12 max-w-3xl mx-auto">
+          <h2 className="fantasy-heading text-2xl mb-4 text-center">Effect Descriptions</h2>
+          <ul className="list-disc list-inside text-fantasy-parchment/80 text-base space-y-2">
+            <li><b>Starfield:</b> Animated star background for a magical feel.</li>
+            <li><b>Orbs:</b> Floating orbs for depth and fantasy ambiance.</li>
+            <li><b>Gradient:</b> Animated background gradient for color and motion.</li>
+            <li><b>Border:</b> Magical glowing borders for cards and panels.</li>
+          </ul>
+        </div>
       </div>
     </div>
   );

@@ -4,9 +4,6 @@ import {
   Question, 
   StoryResponse, 
   questionConfig,
-  PlayerProfileSchema,
-  QuestionSchema,
-  StoryResponseSchema
 } from '@/types';
 import { 
   validatePlayerProfile, 

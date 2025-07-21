@@ -51,15 +51,12 @@ export const StarfieldBackground: React.FC<StarfieldBackgroundProps> = ({
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       starsRef.current.forEach((star) => {
-        // Update twinkle animation
         star.phase += star.twinkleSpeed;
         const twinkleOpacity = (Math.sin(star.phase) + 1) / 2;
         const finalOpacity = star.opacity * twinkleOpacity;
 
-        // Draw star with glow effect
         ctx.save();
         
-        // Outer glow
         ctx.globalAlpha = finalOpacity * 0.3;
         ctx.fillStyle = '#FFD700';
         ctx.shadowBlur = star.size * 4;
@@ -68,7 +65,6 @@ export const StarfieldBackground: React.FC<StarfieldBackgroundProps> = ({
         ctx.arc(star.x, star.y, star.size * 2, 0, Math.PI * 2);
         ctx.fill();
 
-        // Inner star
         ctx.globalAlpha = finalOpacity;
         ctx.shadowBlur = star.size * 2;
         ctx.beginPath();
@@ -86,7 +82,6 @@ export const StarfieldBackground: React.FC<StarfieldBackgroundProps> = ({
       createStars();
     };
 
-    // Initialize
     resizeCanvas();
     createStars();
     animate();

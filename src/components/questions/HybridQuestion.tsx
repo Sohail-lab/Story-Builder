@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { QuestionComponentProps } from '@/types';
 import { ErrorMessage, ValidationFeedback, useQuestionValidation } from '@/components/validation';
 import { MobileOptimizedCard, MobileOptimizedInput } from '@/components/layout';
-import { useMediaQuery } from '@/hooks';
 
 export const HybridQuestion: React.FC<QuestionComponentProps> = ({
   question,
@@ -17,10 +16,6 @@ export const HybridQuestion: React.FC<QuestionComponentProps> = ({
   const [customText, setCustomText] = useState<string>('');
   const [showCustomInput, setShowCustomInput] = useState(false);
 
-  // Check if we're on mobile for optimizations
-  const isMobile = useMediaQuery('(max-width: 768px)');
-
-  // Use validation hook
   const {
     validateQuestion,
     debouncedValidate,
@@ -29,10 +24,8 @@ export const HybridQuestion: React.FC<QuestionComponentProps> = ({
     error: validationError
   } = useQuestionValidation(question.id);
 
-  // Use validation error if available, otherwise use prop error
   const displayError = validationError || error;
 
-  // Initialize state from value prop
   useEffect(() => {
     if (value) {
       const isPresetOption = question.options?.includes(value);
@@ -53,7 +46,6 @@ export const HybridQuestion: React.FC<QuestionComponentProps> = ({
     
     if (option === 'custom') {
       setShowCustomInput(true);
-      // Don't change the main value yet, wait for custom input
       if (customText) {
         onChange(customText);
         validateQuestion(customText);
@@ -62,7 +54,6 @@ export const HybridQuestion: React.FC<QuestionComponentProps> = ({
       setShowCustomInput(false);
       setCustomText('');
       onChange(option);
-      // Validate immediately when preset option is selected
       validateQuestion(option);
     }
   };
@@ -71,7 +62,6 @@ export const HybridQuestion: React.FC<QuestionComponentProps> = ({
     setCustomText(newValue);
     if (selectedOption === 'custom') {
       onChange(newValue);
-      // Trigger validation with debounce for custom text
       if (newValue.trim()) {
         debouncedValidate(newValue);
       }
@@ -79,7 +69,6 @@ export const HybridQuestion: React.FC<QuestionComponentProps> = ({
   };
 
   const handleCustomInputFocus = () => {
-    // Validate immediately on blur for custom text
     if (selectedOption === 'custom' && customText.trim()) {
       validateQuestion(customText);
     }

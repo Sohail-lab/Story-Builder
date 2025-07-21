@@ -26,7 +26,6 @@ export function StoryGenerator({
     generateStory,
     retryGeneration,
     clearError,
-    loadingMessage,
     loadingProgress,
     canRetry
   } = useStoryGenerationWithLoading({

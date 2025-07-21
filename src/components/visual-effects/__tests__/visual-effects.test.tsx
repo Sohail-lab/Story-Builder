@@ -7,7 +7,6 @@ import {
   MagicalBorder,
 } from '../index';
 
-// Mock canvas context for StarfieldBackground tests
 const mockGetContext = jest.fn(() => ({
   clearRect: jest.fn(),
   fillStyle: '',
@@ -25,7 +24,6 @@ Object.defineProperty(HTMLCanvasElement.prototype, 'getContext', {
   value: mockGetContext,
 });
 
-// Mock requestAnimationFrame
 global.requestAnimationFrame = jest.fn((cb) => {
   setTimeout(cb, 0);
   return 1;

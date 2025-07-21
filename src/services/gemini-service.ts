@@ -252,23 +252,6 @@ Make the story immersive, detailed, and true to the character's profile. Use viv
    */
   async testConnection(): Promise<boolean> {
     try {
-      const testProfile: PlayerProfile = {
-        name: 'Test',
-        gender: 'Male',
-        race: 'Human',
-        specialty: 'Warrior',
-        lifestyle: 'Adventurous',
-        romanceInterest: false,
-        personalityTrait: 'Brave',
-        favoriteEnvironment: 'Forest',
-        magicalAffinity: 'None',
-        socialPreference: 'Small Groups',
-        moralAlignment: 'Lawful',
-        primaryMotivation: 'Justice',
-        additionalChoices: {},
-        customAnswers: {}
-      };
-      
       const model = this.genAI.getGenerativeModel({ model: this.config.model });
       const result = await model.generateContent('Test connection. Respond with: {"test": "success"}');
       

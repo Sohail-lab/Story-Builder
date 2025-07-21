@@ -36,6 +36,9 @@ export function NavigationControls({
       <motion.button
         onClick={onPrevious}
         disabled={!canGoBack}
+        aria-label="Go to previous question"
+        aria-disabled={!canGoBack ? 'true' : undefined}
+        type="button"
         className={`
           flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all duration-300
           ${canGoBack 
@@ -57,6 +60,9 @@ export function NavigationControls({
       <motion.button
         onClick={handleNext}
         disabled={!canGoForward}
+        aria-label={isLastQuestion ? 'Complete the quest' : 'Go to next question'}
+        aria-disabled={!canGoForward ? 'true' : undefined}
+        type="button"
         className={`
           flex items-center gap-2 px-8 py-3 rounded-lg font-medium transition-all duration-300 relative overflow-hidden
           ${canGoForward 

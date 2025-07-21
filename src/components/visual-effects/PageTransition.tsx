@@ -60,7 +60,6 @@ export const PageTransition: React.FC<PageTransitionProps> = ({
   sparkleCount = 20,
   className = ''
 }) => {
-  // Generate sparkles with random positions and properties
   const sparkles = React.useMemo(() => {
     const sparkleColors = [
       'rgba(255, 215, 0, 0.8)', // Gold
