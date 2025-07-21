@@ -53,17 +53,18 @@ src/
    ```
 
 2. **Set up environment variables:**
-   - Copy `.env` and set your site URL:
+   - Copy `.env` and set the site URL and Gemini API key:
      ```
-     NEXT_PUBLIC_SITE_URL=https://yourdomain.com
+     NEXT_PUBLIC_SITE_URL=https://fantasy-story-builder.vercel.app/
+     NEXT_PUBLIC_GEMINI_API_KEY=your_actual_gemini_api_key
      ```
-   - This is used for SEO, sitemap, and robots.txt.
+   - These are used for SEO, sitemap, robots.txt, and AI story generation.
 
 3. **Run the development server:**
    ```bash
    npm run dev
    ```
-   Open [http://localhost:3000](http://localhost:3000) in your browser.
+   Open [http://localhost:3000](http://localhost:3000) in a browser.
 
 ---
 
@@ -73,7 +74,7 @@ src/
    ```bash
    npm run build
    ```
-   - After build, the `postbuild` script will automatically update `public/robots.txt` with your site URL.
+   - After build, the `postbuild` script will automatically update `public/robots.txt` with the site URL.
 
 2. **Start the server:**
    ```bash
@@ -81,7 +82,7 @@ src/
    ```
 
 3. **SEO & Robots:**
-   - `public/robots.txt` and the dynamic `/sitemap.xml` are automatically configured for your domain.
+   - `public/robots.txt` and the dynamic `/sitemap.xml` are automatically configured for the deployment domain.
    - Update `NEXT_PUBLIC_SITE_URL` in `.env` for each environment (local, staging, production).
 
 ---
@@ -102,7 +103,7 @@ src/
 - `npm run build` – Build for production
 - `npm start` – Start production server
 - `npm run lint` – Lint code
-- `postbuild` – (runs automatically) Updates robots.txt with your site URL
+- `postbuild` – (runs automatically) Updates robots.txt with the site URL
 
 ---
 
@@ -114,24 +115,24 @@ src/
 
 ---
 
-## Deployment to Vercel
+## Deployment
 
-You can deploy this project to [Vercel](https://vercel.com/) for fast, serverless hosting.
+This project is designed for seamless deployment on modern serverless platforms such as [Vercel](https://vercel.com/).
 
-**Steps:**
-1. Push your code to GitHub, GitLab, or Bitbucket.
-2. Import your repository into Vercel.
-3. Set the environment variable `NEXT_PUBLIC_SITE_URL` in the Vercel dashboard to your production domain (e.g., `https://yourdomain.com`).
-4. Vercel will handle builds, deployments, and serverless hosting automatically.
-5. [Optional] Set up a custom domain in Vercel for your site.
+**Live Example:**
+- [https://fantasy-story-builder.vercel.app/](https://fantasy-story-builder.vercel.app/)
 
-*Add any additional Vercel-specific notes or custom steps here as needed.*
+**Deployment Notes:**
+- The environment variable `NEXT_PUBLIC_SITE_URL` should be set to the production URL (e.g., `https://fantasy-story-builder.vercel.app/`).
+- The environment variable `NEXT_PUBLIC_GEMINI_API_KEY` must be set for AI-powered story generation.
+- After deployment, SEO and robots.txt configuration will automatically use the correct domain.
+- A custom domain can be configured if desired.
 
 ---
 
 ## Contributing
 
-Pull requests and issues are welcome! Please open an issue to discuss major changes.
+Pull requests and issues are welcome. Please open an issue to discuss major changes.
 
 ---
 
